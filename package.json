@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest testing --config=jest.config.js",
-    "lint": "eslint testing/**/*.js --fix"
+    "lint": "eslint testing/**/*.js --fix",
+    "go:setup": "GOPATH=$(pwd) PATH=$PATH:$GOPATH/bin go get github.com/go-ini/ini",
+    "start": "npm run go:setup && GOPATH=$(pwd) PATH=$PATH:$GOPATH/bin go run src/main/main.go src/myconfig.ini"
   },
   "repository": {
     "type": "git",
