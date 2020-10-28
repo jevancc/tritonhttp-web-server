@@ -1,5 +1,5 @@
 const { runServer } = require('./libs/server');
-const { waitForServerStart, waitForrespond } = require('./libs/utils');
+const { waitForServerStart, waitForResponse } = require('./libs/utils');
 
 const SERVER_PORT = 7001;
 
@@ -19,11 +19,11 @@ describe('basic', () => {
   test('should respond correct HTTP version in header.', async () => {
     const client = createClient();
     client.connect();
-    await waitForrespond();
+    await waitForResponse();
     expect(client.ready).toBeTruthy();
 
     client.sendHttpGet('/', { Host: 'localhost', Connection: 'close' });
-    await waitForrespond();
+    await waitForResponse();
 
     const header = client.nextHttpHeader();
     expect(header.version).toBe('HTTP/1.1');
@@ -32,14 +32,13 @@ describe('basic', () => {
   test('should respond 200 when file exists.', async () => {
     const client = createClient();
     client.connect();
-    await waitForrespond();
+    await waitForResponse();
     expect(client.ready).toBeTruthy();
 
     client.sendHttpGet('/UCSD_Seal.png', { Host: 'localhost', Connection: 'close' });
-    await waitForrespond();
+    await waitForResponse();
 
     const header = client.nextHttpHeader();
-    console.log(header)
     expect(header.code).toBe('200');
     expect(header.description).toBe('OK');
   });
@@ -47,11 +46,11 @@ describe('basic', () => {
   test('should respond 404 when file does not exist.', async () => {
     const client = createClient();
     client.connect();
-    await waitForrespond();
+    await waitForResponse();
     expect(client.ready).toBeTruthy();
 
     client.sendHttpGet('/NOT_EXIST.TXT', { Host: 'localhost', Connection: 'close' });
-    await waitForrespond();
+    await waitForResponse();
 
     const header = client.nextHttpHeader();
     expect(header.code).toBe('404');
@@ -61,14 +60,13 @@ describe('basic', () => {
   test('should respond 400 when Host is not presented request.', async () => {
     const client = createClient();
     client.connect();
-    await waitForrespond();
+    await waitForResponse();
     expect(client.ready).toBeTruthy();
 
     client.sendHttpGet('/', { Connection: 'close' });
-    await waitForrespond();
+    await waitForResponse();
 
     const header = client.nextHttpHeader();
-    console.log(header)
     expect(header.code).toBe('400');
     expect(header.description).toBe('Bad Request: missing required Host header');
   });
