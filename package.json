@@ -1,0 +1,25 @@
+{
+  "name": "module-2-project-cse224-chan-xia",
+  "version": "1.0.0",
+  "description": "TritonHTTP Web Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest testing --config=jest.config.js",
+    "lint": "eslint testing/**/*.js --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia/issues"
+  },
+  "homepage": "https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia#readme",
+  "devDependencies": {
+    "eslint": "^7.12.1",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^26.6.1"
+  }
+}
