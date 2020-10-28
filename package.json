@@ -5,9 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "jest testing --config=jest.config.js",
+    "test:setup": "npm run go:setup",
+    "test:start-server": "GOPATH=$(pwd) PATH=$PATH:$GOPATH/bin go run src/main/main.go",
     "lint": "eslint testing/**/*.js --fix",
     "go:setup": "GOPATH=$(pwd) PATH=$PATH:$GOPATH/bin go get github.com/go-ini/ini",
     "start": "npm run go:setup && GOPATH=$(pwd) PATH=$PATH:$GOPATH/bin go run src/main/main.go src/myconfig.ini"
+  },
+  "testing": {
+    "use-default-server": true,
+    "server-port": 8080,
+    "doc-root": "./sample_htdocs/"
   },
   "repository": {
     "type": "git",
@@ -22,6 +29,8 @@
   "devDependencies": {
     "eslint": "^7.12.1",
     "eslint-config-google": "^0.14.0",
-    "jest": "^26.6.1"
+    "jest": "^26.6.1",
+    "shelljs": "^0.8.4",
+    "tmp": "^0.2.1"
   }
 }
