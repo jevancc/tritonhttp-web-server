@@ -28,7 +28,20 @@ class TritonHTTPTestClient {
   }
 
   connect() {
-    return new Promise((resolve) => this.socket.connect(this.port, this.ip, () => resolve()));
+    return new Promise((resolve, reject) => {
+      this.socket.connect(this.port, this.ip);
+      const checkSocketReady = (retryCount) => {
+        if (this.ready) {
+          resolve();
+        } else if (retryCount >= 10) {
+          reject(new Error('Socket failed to connect to the server'));
+        } else {
+          setTimeout(() => checkSocketReady(retryCount + 1), 100);
+        }
+      };
+
+      setTimeout(() => checkSocketReady(0), 200);
+    });
   }
 
   send(data) {
@@ -96,14 +109,14 @@ class TritonHTTPTestClient {
     while (true) {
       const keyValue = this.nextHttpHeaderKeyValue();
       if (keyValue) {
-        const {key, value} = keyValue;
+        const { key, value } = keyValue;
         keyValues[key] = value;
       } else {
         break;
       }
     }
 
-    const header = {...initialLine, keyValues};
+    const header = { ...initialLine, keyValues };
     return header;
   }
 
@@ -115,7 +128,7 @@ class TritonHTTPTestClient {
         const body = this.databuf.slice(0, contentLength);
         this.databuf = this.databuf.slice(contentLength);
 
-        return {header, body};
+        return { header, body };
       } else {
         throw new Error('InvalidData: buffer does not have expected content length');
       }

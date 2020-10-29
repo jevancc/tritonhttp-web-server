@@ -2,23 +2,28 @@ const fs = require('fs');
 const path = require('path');
 const tmp = require('tmp');
 const shell = require('shelljs');
-const {TritonHTTPTestClient} = require('./client');
+const { TritonHTTPTestClient } = require('./client');
 
-const {testing: defaultTestingConfig} = require('../../package.json');
-const defaultDocRoot = path.join(__dirname, '../../', defaultTestingConfig['doc-root']);
+const { testing: defaultTestingConfig } = require('../../package.json');
 
 function runServer(config = {}) {
   const {
     useDefaultServer = defaultTestingConfig['use-default-server'],
-    port = defaultTestingConfig['server-port'],
-    docRoot = defaultDocRoot,
     mimeTypes = path.join(__dirname, '../../src/mime.types'),
+    docMap = null,
+    port,
+    docRoot,
   } = config;
 
-  const tmpfile = tmp.fileSync({mode: 0o644, prefix: 'triton-http-config', postfix: '.ini'});
-  writeServerConfig(tmpfile.name, {useDefaultServer, port, docRoot, mimeTypes});
+  const docDir = docMap ? createTempDocDir(docMap) : null;
+  const configFile = createTempServerConfigFile({
+    useDefaultServer,
+    port,
+    docRoot: docMap ? docDir.name : docRoot,
+    mimeTypes,
+  });
 
-  const serverProcess = shell.exec(`npm run test:start-server -- ${tmpfile.name}`, {
+  const serverProcess = shell.exec(`npm run test:start-server -- ${configFile.name}`, {
     cwd: path.join(__dirname, '../../'),
     silent: true,
     async: true,
@@ -26,31 +31,42 @@ function runServer(config = {}) {
 
   const clients = [];
   const createClient = (handlers) => {
-    const client = new TritonHTTPTestClient({ip: 'localhost', port}, handlers);
+    const client = new TritonHTTPTestClient({ ip: 'localhost', port }, handlers);
     clients.push(client);
     return client;
   };
 
   const cleanup = () => {
     serverProcess.kill('SIGKILL');
-    tmpfile.removeCallback();
-    shell.exec(`fuser -k -n tcp ${port}`, {async: true, silent: true});
+    configFile.removeCallback();
+    if (docDir) {
+      shell.rm('-rf', path.join(docDir.name, '*'));
+      docDir.removeCallback();
+    }
+    shell.exec(`fuser -k -n tcp ${port}`, { async: true, silent: true });
     for (const client of clients) {
       client.close();
     }
   };
 
-  return {createClient, cleanup};
+  return { createClient, cleanup };
 }
 module.exports.runServer = runServer;
 
-function writeServerConfig(fileName, config = {}) {
+function createTempServerConfigFile(config = {}) {
   const {
     useDefaultServer,
     port,
     docRoot,
     mimeTypes,
   } = config;
+
+  const configFile = tmp.fileSync({
+    discardDescriptor: true,
+    mode: 0o644,
+    prefix: 'triton-http-test-config',
+    postfix: '.ini',
+  });
 
   const configIniConent = [
     `[httpd]`,
@@ -60,22 +76,28 @@ function writeServerConfig(fileName, config = {}) {
     `mime_types=${mimeTypes}`,
   ].join('\n');
 
-  fs.writeFileSync(fileName, configIniConent);
+  fs.writeFileSync(configFile.name, configIniConent);
+  return configFile;
 }
 
-function createTempDir() {
-  return new Promise((resolve) => {
-    tmp.dir((err, dirPath, cleanupCallback) => {
-      if (err) {
-        throw err;
-      }
-
-      const getTempPath = (fileRelativePath) => path.join(dirPath, fileRelativePath);
-      resolve(getTempPath, cleanupCallback);
-    });
+function createTempDocDir(docMap) {
+  const dir = tmp.dirSync({
+    prefix: 'triton-http-test-docs',
   });
-}
+  const getPath = (...prefix) => path.join(dir.name, ...prefix);
 
-function copyAllFiles(src, dest) {
-  shell.cp('-R', src, dest);
+  const build = (docs, prefix) => {
+    for (const [name, content] of Object.entries(docs)) {
+      if (content instanceof Object) {
+        shell.mkdir('-p', getPath(...prefix, name));
+        build(content, [...prefix, name]);
+      } else {
+        const fileName = getPath(...prefix, name);
+        fs.writeFileSync(fileName, content);
+      }
+    }
+  };
+
+  build(docMap, []);
+  return dir;
 }

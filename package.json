@@ -12,9 +12,7 @@
     "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini"
   },
   "testing": {
-    "use-default-server": true,
-    "server-port": 8080,
-    "doc-root": "./sample_htdocs/"
+    "use-default-server": true
   },
   "repository": {
     "type": "git",

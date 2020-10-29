@@ -1,73 +1,89 @@
 const { runServer } = require('./libs/server');
-const { waitForServerStart, waitForResponse } = require('./libs/utils');
+const { waitForServerStart, waitForResponse, areBuffersEqual } = require('./libs/utils');
+
+jest.setTimeout(100000);
 
 const SERVER_PORT = 7001;
+const docMap = {
+  'index.html': Buffer.from('Hello World'),
+  'testfile.txt': Buffer.from('This is the testfile!!!'),
+};
 
-describe('basic', () => {
-  let server, createClient;
+let server, createClient;
 
-  beforeEach(async () => {
-    server = runServer({ port: SERVER_PORT });
-    createClient = server.createClient;
-    await waitForServerStart();
-  });
+beforeAll(async () => {
+  server = runServer({ port: SERVER_PORT, docMap });
+  createClient = server.createClient;
+  await waitForServerStart();
+});
 
-  afterEach(() => {
-    server.cleanup();
-  });
+afterAll(() => {
+  server.cleanup();
+});
 
-  test('should respond correct HTTP version in header.', async () => {
-    const client = createClient();
-    client.connect();
-    await waitForResponse();
-    expect(client.ready).toBeTruthy();
+test('should connect to server.', async () => {
+  const client = createClient();
+  await client.connect();
+  expect(client.ready).toBeTruthy();
+});
 
-    client.sendHttpGet('/', { Host: 'localhost', Connection: 'close' });
-    await waitForResponse();
+test('should respond correct HTTP version in header.', async () => {
+  const client = createClient();
+  await client.connect();
 
-    const header = client.nextHttpHeader();
-    expect(header.version).toBe('HTTP/1.1');
-  });
+  client.sendHttpGet('/', { Host: 'localhost', Connection: 'close' });
+  await waitForResponse();
 
-  test('should respond 200 when file exists.', async () => {
-    const client = createClient();
-    client.connect();
-    await waitForResponse();
-    expect(client.ready).toBeTruthy();
+  const header = client.nextHttpHeader();
+  expect(header.version).toBe('HTTP/1.1');
+});
 
-    client.sendHttpGet('/UCSD_Seal.png', { Host: 'localhost', Connection: 'close' });
-    await waitForResponse();
+test('should respond 200 when file exists.', async () => {
+  const client = createClient();
+  await client.connect();
 
-    const header = client.nextHttpHeader();
-    expect(header.code).toBe('200');
-    expect(header.description).toBe('OK');
-  });
+  client.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  await waitForResponse();
 
-  test('should respond 404 when file does not exist.', async () => {
-    const client = createClient();
-    client.connect();
-    await waitForResponse();
-    expect(client.ready).toBeTruthy();
+  const header = client.nextHttpHeader();
+  expect(header.code).toBe('200');
+  expect(header.description).toBe('OK');
+});
 
-    client.sendHttpGet('/NOT_EXIST.TXT', { Host: 'localhost', Connection: 'close' });
-    await waitForResponse();
+test('should respond 404 when file does not exist.', async () => {
+  const client = createClient();
+  await client.connect();
 
-    const header = client.nextHttpHeader();
-    expect(header.code).toBe('404');
-    expect(header.description).toBe('Not Found');
-  });
+  client.sendHttpGet('/NOT_EXIST.TXT', { Host: 'localhost', Connection: 'close' });
+  await waitForResponse();
 
-  test('should respond 400 when Host is not presented request.', async () => {
-    const client = createClient();
-    client.connect();
-    await waitForResponse();
-    expect(client.ready).toBeTruthy();
+  const header = client.nextHttpHeader();
+  expect(header.code).toBe('404');
+  expect(header.description).toBe('Not Found');
+});
 
-    client.sendHttpGet('/', { Connection: 'close' });
-    await waitForResponse();
+test('should respond 400 when Host is not presented request.', async () => {
+  const client = createClient();
+  await client.connect();
 
-    const header = client.nextHttpHeader();
-    expect(header.code).toBe('400');
-    expect(header.description).toBe('Bad Request: missing required Host header');
-  });
+  client.sendHttpGet('/', { Connection: 'close' });
+  await waitForResponse();
+
+  const header = client.nextHttpHeader();
+  expect(header.code).toBe('400');
+  expect(header.description).toBe('Bad Request: missing required Host header');
+});
+
+test('should respond file content with correct content length when file exists.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  await waitForResponse();
+
+  const response = client.nextHttpResponse();
+  console.log(response.body.toString());
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(docMap['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, docMap['testfile.txt'])).toBeTruthy();
 });
