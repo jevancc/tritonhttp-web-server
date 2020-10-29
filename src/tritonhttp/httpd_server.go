@@ -1,27 +1,47 @@
 package tritonhttp
 
-/** 
+import "net"
+
+/**
 	Initialize the tritonhttp server by populating HttpServer structure
 **/
-func NewHttpdServer(port, docRoot, mimePath string) (*HttpServer, error) {
-	panic("todo - NewHttpdServer")
-
+func NewHttpdServer(port, docRoot string, MIMEPath string) (*HttpServer, error) {
 	// Initialize mimeMap for server to refer
+	MIMEMap, err := ParseMIME(MIMEPath)
+	if err != nil {
+		return nil, err
+	}
 
+	httpServer := HttpServer{
+		ServerPort: port,
+		DocRoot:    docRoot,
+		MIMEPath:   MIMEPath,
+		MIMEMap:    MIMEMap,
+	}
 	// Return pointer to HttpServer
+
+	return &httpServer, nil
 }
 
-/** 
+/**
 	Start the tritonhttp server
 **/
 func (hs *HttpServer) Start() (err error) {
-	panic("todo - StartServer")
 
 	// Start listening to the server port
+	ln, err := net.Listen("tcp", hs.ServerPort)
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
 
 	// Accept connection from client
-
-	// Spawn a go routine to handle request
-
+	for {
+		// Spawn a go routine to handle request
+		conn, err := ln.Accept()
+		if err != nil {
+			return err
+		}
+		go hs.handleConnection(conn)
+	}
 }
-
