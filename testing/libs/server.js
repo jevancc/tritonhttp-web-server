@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const tmp = require('tmp');
 const shell = require('shelljs');
+const kill = require('kill-port');
 const { TritonHTTPTestClient } = require('./client');
 
 const { testing: defaultTestingConfig } = require('../../package.json');
@@ -43,7 +44,7 @@ function runServer(config = {}) {
       shell.rm('-rf', path.join(docDir.name, '*'));
       docDir.removeCallback();
     }
-    shell.exec(`fuser -k -n tcp ${port}`, { async: true, silent: true });
+    kill(port, 'tcp');
     for (const client of clients) {
       client.close();
     }

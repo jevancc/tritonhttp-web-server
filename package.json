@@ -9,7 +9,9 @@
     "test:start-server": "GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go",
     "lint": "eslint testing/**/*.js --fix",
     "go:setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
-    "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini"
+    "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
+    "kill": "npx kill-port",
+    "kill:all": "npx kill-port 8080 7001 7002"
   },
   "testing": {
     "use-default-server": true
@@ -29,6 +31,7 @@
     "eslint": "^7.12.1",
     "eslint-config-google": "^0.14.0",
     "jest": "^26.6.1",
+    "kill-port": "^1.6.1",
     "shelljs": "^0.8.4",
     "tmp": "^0.2.1"
   }

@@ -4,7 +4,7 @@ const { waitForServerStart, waitForResponse, areBuffersEqual } = require('./libs
 jest.setTimeout(100000);
 
 const SERVER_PORT = 7001;
-const docMap = {
+const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
 };
@@ -12,7 +12,7 @@ const docMap = {
 let server, createClient;
 
 beforeAll(async () => {
-  server = runServer({ port: SERVER_PORT, docMap });
+  server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
   createClient = server.createClient;
   await waitForServerStart();
 });
@@ -82,7 +82,6 @@ test('should respond file content with correct content length when file exists.'
   await waitForResponse();
 
   const response = client.nextHttpResponse();
-  console.log(response.body.toString());
   expect(response.header.code).toBe('200');
   expect(response.header.keyValues['Content-Length']).toBe(docMap['testfile.txt'].length.toString());
   expect(areBuffersEqual(response.body, docMap['testfile.txt'])).toBeTruthy();
