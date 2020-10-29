@@ -83,6 +83,6 @@ test('should respond file content with correct content length when file exists.'
 
   const response = client.nextHttpResponse();
   expect(response.header.code).toBe('200');
-  expect(response.header.keyValues['Content-Length']).toBe(docMap['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response.body, docMap['testfile.txt'])).toBeTruthy();
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });

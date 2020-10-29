@@ -20,7 +20,7 @@ function runServer(config = {}) {
   const configFile = createTempServerConfigFile({
     useDefaultServer,
     port,
-    docRoot: docMap ? docDir.name : docRoot,
+    docRoot: docMap ? path.join(docDir.name, './SERVER_ROOT/') : docRoot,
     mimeTypes,
   });
 
@@ -85,7 +85,8 @@ function createTempDocDir(docMap) {
   const dir = tmp.dirSync({
     prefix: 'triton-http-test-docs',
   });
-  const getPath = (...prefix) => path.join(dir.name, ...prefix);
+  const getPath = (...prefix) => path.join(dir.name, './SERVER_ROOT/', ...prefix);
+  shell.mkdir('-p', getPath('./'));
 
   const build = (docs, prefix) => {
     for (const [name, content] of Object.entries(docs)) {

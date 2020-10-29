@@ -50,10 +50,10 @@ test.skip('should respond with content-type (pipeline & comprehensive)', async (
   const client = createClient();
   await client.connect();
 
-  Object.keys(docMap).map(file => client.sendHttpGet(`/${file}`, { Host: 'localhost' }));
+  Object.keys(DOC_MAP).map(file => client.sendHttpGet(`/${file}`, { Host: 'localhost' }));
   await waitForResponse();
 
-  Object.entries(docMap).map(([file, content]) => {
+  Object.entries(DOC_MAP).map(([file, content]) => {
     const postfix = '.' + file.split('.')[1];
     const type = mimeTypes[postfix];
 
