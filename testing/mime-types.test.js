@@ -1,3 +1,4 @@
+const path = require('path');
 const { runServer } = require('./libs/server');
 const { waitForServerStart, waitForResponse, areBuffersEqual } = require('./libs/utils');
 const { mimeTypes } = require('./libs/mime');
@@ -5,11 +6,11 @@ const { mimeTypes } = require('./libs/mime');
 jest.setTimeout(100000);
 
 const SERVER_PORT = 7002;
-const DOC_MAP = Object.keys(mimeTypes).reduce((docs, postfix) => ({
+const DOC_MAP = Object.keys(mimeTypes).reduce((docs, ext) => ({
   ...docs,
-  [`test${postfix}`]: Buffer.from(`This is a sample of ${postfix} file`),
+  [`test${ext}`]: Buffer.from(`This is a ${ext} file`),
 }), {
-  'test.xxxx': Buffer.from('Unknown type file'),
+  'test.xxxx': Buffer.from('Unknown ext file'),
 });
 
 let server, createClient;
@@ -46,19 +47,20 @@ test('should responed content-type for unknown file extension.', async () => {
   expect(header.keyValues['Content-Type']).toBe('application/octet-stream');
 });
 
-test.skip('should respond with content-type (pipeline & comprehensive)', async () => {
+test('should respond with content-type (pipeline & comprehensive)', async () => {
   const client = createClient();
   await client.connect();
 
   Object.keys(DOC_MAP).map(file => client.sendHttpGet(`/${file}`, { Host: 'localhost' }));
   await waitForResponse();
+  await waitForResponse();
 
   Object.entries(DOC_MAP).map(([file, content]) => {
-    const postfix = '.' + file.split('.')[1];
-    const type = mimeTypes[postfix];
+    const fileExt = path.extname(file);
+    const fileType = mimeTypes[fileExt] ?? 'application/octet-stream';
 
     const response = client.nextHttpResponse();
-    expect(response.header.keyValues['Content-Type']).toBe(type);
+    expect(response.header.keyValues['Content-Type']).toBe(fileType);
     expect(response.header.keyValues['Content-Length']).toBe(content.length.toString());
     expect(areBuffersEqual(response.body, content)).toBeTruthy();
   });
