@@ -15,7 +15,7 @@
     "kill:all": "npx kill-port 8080 && npm run kill:test"
   },
   "testing": {
-    "use-default-server": true
+    "use-default-server": false
   },
   "repository": {
     "type": "git",

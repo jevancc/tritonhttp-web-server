@@ -3,6 +3,7 @@ package tritonhttp
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"regexp"
 	"strings"
@@ -23,37 +24,32 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 	reader := bufio.NewReader(conn)
 
-	httpRequestBuffer := ""
+	httpRequestBuffer := []byte{}
 	currentHttpRequest := NewHttpRequestHeader()
 
 	// Start a loop for reading requests continuously
-	for isHandlingConnection := true; isHandlingConnection; {
+	for {
 		// Set a timeout for read operation
 		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 
 		// Read from the connection socket into a buffer
 		if b, err := reader.ReadByte(); err != nil {
 			// Reaching the end of the input or an error
-			fmt.Println("Conn end", err)
+			log.Println("Connection err:", err)
 			break
-		} else if len(httpRequestBuffer)+1 > 1024 {
+		} else if len(httpRequestBuffer) > 2048 {
 			// Bad request
 			hs.handleBadRequest(conn)
-			isHandlingConnection = false
+			break
 		} else {
-			httpRequestBuffer += string(b)
+			httpRequestBuffer = append(httpRequestBuffer, b)
 		}
 
-		for isHandlingConnection && len(httpRequestBuffer) > 0 {
-			splition := strings.SplitN(httpRequestBuffer, "\r\n", 2)
-			if len(splition) != 2 {
-				break
-			}
-
+		L := len(httpRequestBuffer)
+		if L >= 2 && httpRequestBuffer[L-2] == '\r' && httpRequestBuffer[L-1] == '\n' {
 			// Validate the request lines that were read
-			line := strings.TrimSpace(splition[0])
-			httpRequestBuffer = splition[1]
-
+			line := string(httpRequestBuffer[:L-2])
+			httpRequestBuffer = httpRequestBuffer[:0]
 			if len(line) > 0 {
 				// Update any ongoing requests
 				if !currentHttpRequest.IsInitialLine {
@@ -67,7 +63,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					} else {
 						/// Bad initial line
 						hs.handleBadRequest(conn)
-						isHandlingConnection = false
 					}
 				} else {
 					keyValueParts := regexp.MustCompile(`:\s*`).Split(line, 2)
@@ -87,7 +82,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					} else {
 						// Bad key-value line
 						hs.handleBadRequest(conn)
-						isHandlingConnection = false
 					}
 				}
 			} else {

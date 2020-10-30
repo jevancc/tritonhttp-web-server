@@ -18,7 +18,7 @@ const DOC_MAP = {
     }
   },
   'dir2': {
-    'file2': Buffer.from('This is the file2'),
+    'file2.txt': Buffer.from('This is the file2'),
   }
 };
 
@@ -162,7 +162,6 @@ test('should respond 404 when path escape document root.', async () => {
 
   const { header } = client.nextHttpResponse();
   expect(header.code).toBe('404');
-  expect(areBuffersEqual(body, content)).toBeTruthy();
 });
 
 
@@ -175,7 +174,6 @@ test('should respond 404 when path escape document root (escape filesystem root)
 
   const { header } = client.nextHttpResponse();
   expect(header.code).toBe('404');
-  expect(areBuffersEqual(body, content)).toBeTruthy();
 });
 
 

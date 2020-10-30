@@ -18,8 +18,8 @@ func NewHttpdServer(port, docRoot string, MIMEPath string) (*HttpServer, error) 
 		MIMEPath:   MIMEPath,
 		MIMEMap:    MIMEMap,
 	}
-	// Return pointer to HttpServer
 
+	// Return pointer to HttpServer
 	return &httpServer, nil
 }
 
@@ -44,4 +44,11 @@ func (hs *HttpServer) Start() (err error) {
 		}
 		go hs.handleConnection(conn)
 	}
+}
+
+func (hs *HttpServer) GetMIMEType(ext string) string {
+	if val, ok := hs.MIMEMap[ext]; ok {
+		return val
+	}
+	return "application/octet-stream"
 }

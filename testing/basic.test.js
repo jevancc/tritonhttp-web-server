@@ -71,7 +71,7 @@ test('should respond 400 when Host is not presented request.', async () => {
 
   const header = client.nextHttpHeader();
   expect(header.code).toBe('400');
-  expect(header.description).toBe('Bad Request: missing required Host header');
+  expect(header.description).toBe('Bad Request');
 });
 
 test('should respond file content with correct content length when file exists.', async () => {

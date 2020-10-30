@@ -36,3 +36,10 @@ func NewHttpRequestHeader() HttpRequestHeader {
 	header.IsInitialLine = false
 	return header
 }
+
+/**
+	If the HTTP request header has key-value "Connection: close"
+**/
+func (req *HttpRequestHeader) IsConnectionClose() bool {
+	return req.Connection == "close"
+}
