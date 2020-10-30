@@ -46,6 +46,9 @@ func (hs *HttpServer) Start() (err error) {
 	}
 }
 
+/**
+	Return the MIME type of the given file extension
+**/
 func (hs *HttpServer) GetMIMEType(ext string) string {
 	if val, ok := hs.MIMEMap[ext]; ok {
 		return val
