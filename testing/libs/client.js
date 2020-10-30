@@ -27,6 +27,10 @@ class TritonHTTPTestClient {
     this.socket.on('close', closeHandler);
   }
 
+  isBufferEmpty() {
+    return this.databuf.length === 0;
+  }
+
   connect() {
     return new Promise((resolve, reject) => {
       this.socket.connect(this.port, this.ip);

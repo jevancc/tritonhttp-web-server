@@ -35,7 +35,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		// Read from the connection socket into a buffer
 		if b, err := reader.ReadByte(); err != nil {
 			// Reaching the end of the input or an error
-			if err, ok := err.(net.Error); ok && err.Timeout() && len(httpRequestBuffer) > 0 {
+			if err, ok := err.(net.Error); ok && err.Timeout() && (len(httpRequestBuffer) > 0 || currentHttpRequest.IsInitialLine) {
 				// Read timeout occurs and client has sent part of a request
 				// Should reply 400 client error
 				hs.handleBadRequest(conn)
