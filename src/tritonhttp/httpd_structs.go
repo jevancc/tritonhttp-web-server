@@ -1,5 +1,7 @@
 package tritonhttp
 
+import "errors"
+
 type HttpServer struct {
 	ServerPort string
 	DocRoot    string
@@ -42,4 +44,22 @@ func NewHttpRequestHeader() HttpRequestHeader {
 **/
 func (req *HttpRequestHeader) IsConnectionClose() bool {
 	return req.Connection == "close"
+}
+
+/**
+	Validate if the request header has proper values
+**/
+func (req *HttpRequestHeader) Validate() error {
+	switch {
+	case req.Host == "":
+		return errors.New("Host not provided in request header")
+	case req.URL == "" || req.URL[0] != '/':
+		return errors.New("URL must start with a forward slash (\"/\")")
+	case req.Method != "GET":
+		return errors.New("Unknown HTTP method")
+	case req.Version != "HTTP/1.1":
+		return errors.New("HTTP version not supported")
+	default:
+		return nil
+	}
 }

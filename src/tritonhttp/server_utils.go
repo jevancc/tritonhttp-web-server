@@ -21,9 +21,9 @@ func ParseMIME(MIMEPath string) (MIMEMap map[string]string, err error) {
 		line = strings.TrimSpace(line)
 		if len(line) > 0 {
 			lineParts := strings.Split(line, " ")
-			suffix := strings.TrimSpace(lineParts[0])
+			extension := strings.TrimSpace(lineParts[0])
 			mimeType := strings.TrimSpace(lineParts[1])
-			MIMEMap[suffix] = mimeType
+			MIMEMap[extension] = mimeType
 		}
 	}
 

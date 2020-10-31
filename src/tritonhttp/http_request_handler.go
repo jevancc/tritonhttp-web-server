@@ -24,7 +24,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 	reader := bufio.NewReader(conn)
 
-	httpRequestBuffer := []byte{}
+	connReceiveBuffer := []byte{}
 	currentHttpRequest := NewHttpRequestHeader()
 
 	// Start a loop for reading requests continuously
@@ -35,26 +35,26 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		// Read from the connection socket into a buffer
 		if b, err := reader.ReadByte(); err != nil {
 			// Reaching the end of the input or an error
-			if err, ok := err.(net.Error); ok && err.Timeout() && (len(httpRequestBuffer) > 0 || currentHttpRequest.IsInitialLine) {
+			if err, ok := err.(net.Error); ok && err.Timeout() && (len(connReceiveBuffer) > 0 || currentHttpRequest.IsInitialLine) {
 				// Read timeout occurs and client has sent part of a request
 				// Should reply 400 client error
 				hs.handleBadRequest(conn)
 			}
 			log.Println("Connection err:", err)
 			break
-		} else if len(httpRequestBuffer) > 2048 {
+		} else if len(connReceiveBuffer) > 2048 {
 			// Request too large, reply 400 error
 			hs.handleBadRequest(conn)
 			break
 		} else {
-			httpRequestBuffer = append(httpRequestBuffer, b)
+			connReceiveBuffer = append(connReceiveBuffer, b)
 		}
 
-		L := len(httpRequestBuffer)
-		if L >= 2 && httpRequestBuffer[L-2] == '\r' && httpRequestBuffer[L-1] == '\n' {
+		L := len(connReceiveBuffer)
+		if L >= 2 && connReceiveBuffer[L-2] == '\r' && connReceiveBuffer[L-1] == '\n' {
 			// Validate the request lines that were read
-			line := string(httpRequestBuffer[:L-2])
-			httpRequestBuffer = httpRequestBuffer[:0]
+			line := string(connReceiveBuffer[:L-2])
+			connReceiveBuffer = connReceiveBuffer[:0]
 			if len(line) > 0 {
 				// Update any ongoing requests
 				if !currentHttpRequest.IsInitialLine {

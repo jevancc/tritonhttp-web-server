@@ -1,7 +1,6 @@
 package tritonhttp
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -48,7 +47,7 @@ func (hs *HttpServer) handleFileNotFoundRequest(requestHeader *HttpRequestHeader
 }
 
 func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.Conn) {
-	if err := validateRequestHeader(requestHeader); err != nil {
+	if err := requestHeader.Validate(); err != nil {
 		hs.handleBadRequest(conn)
 		return
 	}
@@ -76,21 +75,6 @@ func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.
 			LastModified: getLastModifiedString(time.Now()),
 		}
 		hs.sendResponse(responseHeader, fileContent, conn)
-	}
-}
-
-func validateRequestHeader(requestHeader *HttpRequestHeader) error {
-	switch {
-	case requestHeader.Host == "":
-		return errors.New("Host not provided in request header")
-	case requestHeader.URL == "" || requestHeader.URL[0] != '/':
-		return errors.New("URL must start with a forward slash (\"/\")")
-	case requestHeader.Method != "GET":
-		return errors.New("Unknown HTTP method")
-	case requestHeader.Version != "HTTP/1.1":
-		return errors.New("HTTP version not supported")
-	default:
-		return nil
 	}
 }
 
