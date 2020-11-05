@@ -1,5 +1,5 @@
 const { runServer } = require('./libs/server');
-const { waitForServerStart, waitForResponse, areBuffersEqual, waitForServerTimeout } = require('./libs/utils');
+const { waitForServerStart, waitForResponse, waitForBigResponse, areBuffersEqual, waitForServerTimeout } = require('./libs/utils');
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(() => resolve(), milliseconds));
 }
@@ -8,7 +8,8 @@ jest.setTimeout(100000);
 const SERVER_PORT = 7001;
 const DOC_MAP = {
   'index.html': Buffer.from('Hello World'), 
-  'testfile.txt': Buffer.from('This is the testfile!!!')
+  'testfile.txt': Buffer.from('This is the testfile!!!'),
+  'large.txt': Buffer.alloc(10000000, 'a')
 };
 // copy here
 let server, createClient;
@@ -90,6 +91,35 @@ test('should respond file content with correct content length when file exists.'
   expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
 
+test('Good large file.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.sendHttpGet('/large.txt', { Host: 'localhost', Connection: 'close' });
+  await waitForBigResponse();
+
+  const response = client.nextHttpResponse();
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['large.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['large.txt'])).toBeTruthy();
+});
+
+test.only('Good large request.', async () => {
+  const client = createClient();
+  await client.connect();
+  const headers = {};
+  for (let i = 0; i < 100000; i++) {
+    headers['Host'] = 'localhost';
+  }
+  client.sendHttpGet('/testfile.txt',headers);
+  await waitForBigResponse();
+  
+  const response = client.nextHttpResponse();
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
+});
+
 test('Bad request: should respond 400 when Slash Missing.', async () => {
   const client1 = createClient();
   await client1.connect();
@@ -123,9 +153,6 @@ test('Bad request: should respond 400 when sending non-supported request format.
   expect(header1.header.code).toBe('400');
   expect(header1.header.description).toBe('Bad Request');
   
-  
-
-
 
 });
 
@@ -154,7 +181,7 @@ test('Partial request + Timeout: should respond file content with correct conten
   expect(client.isclosed).toBeTruthy();
 });
 
-test.only('Close: should respond connection header and close connection.', async () => {
+test('Close: should respond connection header and close connection.', async () => {
   // HTTP version other than 1.1
   const client = createClient();
   await client.connect();
