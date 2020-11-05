@@ -25,6 +25,11 @@ async function waitForNextRequest() {
 }
 module.exports.waitForNextRequest = waitForNextRequest;
 
+async function waitForBigResponse() {
+  await sleep(2000);
+}
+module.exports.waitForBigResponse = waitForBigResponse;
+
 function areBuffersEqual(bufA, bufB) {
   const len = bufA.length;
   if (len !== bufB.length) {
