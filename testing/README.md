@@ -13,7 +13,7 @@ We wrote out testing script in Node.js, and we devided the test cases into three
 
 
 To run the test cases run the following command:
-```nmp test```
+```$ nmp test```
 
 ## basic.test.js
 In this file, we tested cases including: valid format, find valid files, and timeout/close.
