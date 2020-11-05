@@ -19,7 +19,8 @@ To run the test cases run the following command:
 In this file, we tested cases including: valid format, find valid files, and timeout/close.
 
 For valid format we tested the following cases:
-1. should respond 400 when Slash Missing.
+### should respond 400 when Slash Missing.
+After a client connected to the server, the client sent a http request with a missing slash URL. We expected the request contained 400 code.
 2. should respond 400 when HTTP/1.1 Missing.
 3. should respond 400 when HTTP version mismatch.
 3. should respond 400 when sending non-supported request format, ex. POST.
