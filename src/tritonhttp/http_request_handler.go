@@ -92,6 +92,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			} else {
 				// End of request, handle complete requests
 				hs.handleResponse(&currentHttpRequest, conn)
+				if currentHttpRequest.IsConnectionClose() {
+					conn.Close()
+				}
 				currentHttpRequest = NewHttpRequestHeader()
 			}
 		}
