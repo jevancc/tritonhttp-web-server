@@ -19,12 +19,13 @@ class TritonHTTPTestClient {
 
     this.databuf = Buffer.from('');
     this.ready = false;
-
+    this.isclosed = false;
     this.socket.on('ready', () => this.ready = true);
     this.socket.on('data', (buf) => this.databuf = Buffer.concat([this.databuf, buf]));
     this.socket.on('timeout', timeoutHandler);
     this.socket.on('end', endHandler);
-    this.socket.on('close', closeHandler);
+    // this.socket.on('close', closeHandler);
+    this.socket.on('close', () => this.isclosed = true);
   }
 
   isBufferEmpty() {
@@ -61,6 +62,23 @@ class TritonHTTPTestClient {
     this.send(data);
   }
 
+  sendPartialGet(file, headers) {
+    const data = [
+      `GET ${file.trim()} HTTP/1.1`,
+      ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+    ].join('\r\n') + '\r\n';
+
+    this.send(data);
+  }
+
+  sendHttpGet_adj(action, file, headers, http_v) {
+    const data = [
+      `${action} ${file.trim()} ${http_v}`,
+      ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+    ].join('\r\n') + '\r\n\r\n';
+
+    this.send(data);
+  }
 
   nextHttpHeaderInitialLine() {
     const buf = this.databuf;

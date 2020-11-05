@@ -14,6 +14,17 @@ async function waitForServerStart() {
 }
 module.exports.waitForServerStart = waitForServerStart;
 
+
+async function waitForServerTimeout() {
+  await sleep(7000);
+}
+module.exports.waitForServerTimeout = waitForServerTimeout;
+
+async function waitForNextRequest() {
+  await sleep(1000);
+}
+module.exports.waitForNextRequest = waitForNextRequest;
+
 function areBuffersEqual(bufA, bufB) {
   const len = bufA.length;
   if (len !== bufB.length) {
