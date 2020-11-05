@@ -1,8 +1,6 @@
 const { runServer } = require('./libs/server');
 const { waitForServerStart, waitForResponse, waitForBigResponse, areBuffersEqual, waitForServerTimeout } = require('./libs/utils');
-function sleep(milliseconds) {
-  return new Promise((resolve) => setTimeout(() => resolve(), milliseconds));
-}
+
 jest.setTimeout(100000);
 
 const SERVER_PORT = 7001;
@@ -12,23 +10,23 @@ const DOC_MAP = {
   'large.txt': Buffer.alloc(10000000, 'a'),
   'empty.txt': Buffer.from('')
 };
-// copy here
+
 let server, createClient;
 
-beforeAll(async () => { // start server
+beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
   createClient = server.createClient;
   await waitForServerStart();
 });
-//
-afterAll(() => { // end server
+
+afterAll(() => {
   server.cleanup();
 });
 
 test('should connect to server and respond nothing when sending nothing.', async () => {
   const client = createClient();
   await client.connect();
-  // await clinent - > blocking
+
   expect(client.isReady).toBeTruthy();
 });
 
