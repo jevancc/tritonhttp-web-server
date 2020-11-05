@@ -18,14 +18,22 @@ To run the test cases run the following command:
 ## basic.test.js
 In this file, we tested cases including: valid format, find valid files, and timeout/close.
 
-For valid format we tested the following cases:
-### should respond 400 when Slash Missing.
-After a client connected to the server, the client sent a http request with a missing slash URL. We expected the request contained 400 code.
-2. should respond 400 when HTTP/1.1 Missing.
-3. should respond 400 when HTTP version mismatch.
-3. should respond 400 when sending non-supported request format, ex. POST.
-4. should respond 400 when Host is not presented request.
-5. should respond 200 and nothing when sending no request.
+### For valid format we tested the following cases:
+
+#### should respond 400 when Slash Missing.
+After a client connected to the server, the client sent a http request with a ```missing slash URL```. We expected the response contained 400 code.
+
+#### should respond 400 when HTTP/1.1 Missing.
+After a client connected to the server, the client sent a http request with ```HTTP/1.0``` in initial line. We expected the response contained 400 code.
+
+#### should respond 400 when sending non-supported request format, ex. POST.
+After a client connected to the server, the client sent a http request with ```POST``` in initial line. We expected the response contained 400 code.
+
+#### should respond 400 when Host is not presented request.
+After a client connected to the server, the client sent a http request without ```Host``` in headers. We expected the response contained 400 code.
+
+#### should respond nothing when sending no request.
+After a client connected to the server, the client did nothing. We expected the connection was established and nothing in response.
 
 For find valid files, we tested the following cases:
 1. should respond 200 and correct content when file exists.
