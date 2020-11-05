@@ -10,7 +10,6 @@ class TritonHTTPTestClient {
     const {
       timeoutHandler = () => { },
       endHandler = () => { },
-      closeHandler = () => { },
     } = handlers;
 
     this.ip = ip;
@@ -18,14 +17,14 @@ class TritonHTTPTestClient {
     this.socket = new net.Socket();
 
     this.databuf = Buffer.from('');
-    this.ready = false;
-    this.isclosed = false;
-    this.socket.on('ready', () => this.ready = true);
+    this.isReady = false;
+    this.isClosed = false;
+
+    this.socket.on('ready', () => this.isReady = true);
     this.socket.on('data', (buf) => this.databuf = Buffer.concat([this.databuf, buf]));
     this.socket.on('timeout', timeoutHandler);
     this.socket.on('end', endHandler);
-    // this.socket.on('close', closeHandler);
-    this.socket.on('close', () => this.isclosed = true);
+    this.socket.on('close', () => this.isClosed = true);
   }
 
   isBufferEmpty() {
@@ -36,7 +35,7 @@ class TritonHTTPTestClient {
     return new Promise((resolve, reject) => {
       this.socket.connect(this.port, this.ip);
       const checkSocketReady = (retryCount) => {
-        if (this.ready) {
+        if (this.isReady) {
           resolve();
         } else if (retryCount >= 10) {
           reject(new Error('Socket failed to connect to the server'));

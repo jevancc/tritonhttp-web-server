@@ -7,7 +7,7 @@ jest.setTimeout(100000);
 
 const SERVER_PORT = 7001;
 const DOC_MAP = {
-  'index.html': Buffer.from('Hello World'), 
+  'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
   'large.txt': Buffer.alloc(10000000, 'a'),
   'empty.txt': Buffer.from('')
@@ -29,7 +29,7 @@ test('should connect to server and respond nothing when sending nothing.', async
   const client = createClient();
   await client.connect();
   // await clinent - > blocking
-  expect(client.ready).toBeTruthy();
+  expect(client.isReady).toBeTruthy();
 });
 
 
@@ -128,7 +128,7 @@ test('should respond the existed file content with correct content when there is
   }
   client.sendHttpGet('/testfile.txt',headers);
   await waitForBigResponse();
-  
+
   const response = client.nextHttpResponse();
   expect(response.header.code).toBe('200');
   expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
@@ -166,8 +166,8 @@ describe('bad request', () => {
     const header1 = client1.nextHttpResponse();
     expect(header1.header.code).toBe('400');
     expect(header1.header.description).toBe('Bad Request');
-    
-  
+
+
   });
 //   test('should respond 400 when sending empty request', async () => {
 //     // send empty format
@@ -186,14 +186,14 @@ describe('bad request', () => {
 test('should respond 400 and close connection when there is partial request.', async () => {
   const client = createClient();
   await client.connect();
-  
+
   client.sendPartialGet('/testfile.txt', { Host: 'localhost'});
   await waitForServerTimeout();
 
   const res1 = client.nextHttpResponse();
   expect(res1.header.code).toBe('400');
-  
-  expect(client.isclosed).toBeTruthy();
+
+  expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy()
 });
 
@@ -203,6 +203,6 @@ test('should end connection when the client close connection.', async () => {
   await client.connect();
   client.close();
   await client.connect();
-  expect(client.isclosed).toBeTruthy();
+  expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy()
 });

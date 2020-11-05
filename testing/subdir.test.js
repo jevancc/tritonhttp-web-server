@@ -37,7 +37,7 @@ afterAll(() => {
 test('should connect to server.', async () => {
   const client = createClient();
   await client.connect();
-  expect(client.ready).toBeTruthy();
+  expect(client.isReady).toBeTruthy();
 });
 
 test('should respond 200 when file exists.', async () => {
