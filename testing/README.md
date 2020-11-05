@@ -10,6 +10,8 @@ Thank you. -->
 
 # Testing Strategies
 We wrote out testing script in Node.js, and we devided the test cases into three files: ```basic.test.js```, ```subdir.test.js```, and ```mime-types.test.js```, and ```concurr-pipe.test.js```. 
+
+
 To run the test cases run the following command:
 ```nmp test```
 
