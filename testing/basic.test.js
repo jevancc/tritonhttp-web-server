@@ -30,7 +30,7 @@ afterAll(() => {
   server.cleanup();
 });
 
-test('should connect to server and respond nothing when sending nothing.', async () => {
+test('should respond nothing when sending nothing.', async () => {
   const client = createClient();
   await client.connect();
 
