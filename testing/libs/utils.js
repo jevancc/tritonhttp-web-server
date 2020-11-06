@@ -94,6 +94,20 @@ function isValidLastModifiedString(s) {
   if (!s) {
     return false;
   } else {
-    return true;
+    const weekDayStrings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const pattern = /^\s*(?<dayName>(Mon|Tue|Wed|Thu|Fri|Sat|Sun)), (?<date>[0-9]{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2} GMT)\s*$/i;
+
+    const match = s.match(pattern);
+    if (!match) {
+      return false;
+    } else {
+      const { dayName, date: dateString } = match.groups;
+      const date = new Date(dateString);
+      if (isNaN(date.getTime()) || weekDayStrings[date.getDay()] !== dayName) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
 }
