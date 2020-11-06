@@ -57,6 +57,11 @@ In this file, we tested cases including: valid format, find valid files, and tim
 2. should end connection when the client close connection.
     - After a client connected to the server, the client shut down the connection. We expected the connection was closed.
 
+3. should keep the connection when "Connection: close" is not in the request header.
+    - After a client connected to the server, the client sent a http request without "Connection: close" in header. We expected the connection was not closed.
+
+3. should close the connection when "Connection: close" is in the request header.
+    - After a client connected to the server, the client sent a http request with "Connection: close" in header. We expected the connection was closed and "Connection: close" is set in the response header.
 
 ## subdir.test.js
 

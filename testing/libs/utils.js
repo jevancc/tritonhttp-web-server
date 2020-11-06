@@ -10,7 +10,7 @@ async function waitForResponse() {
 module.exports.waitForResponse = waitForResponse;
 
 async function waitForServerStart() {
-  await sleep(2000);
+  await sleep(3000);
 }
 module.exports.waitForServerStart = waitForServerStart;
 

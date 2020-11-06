@@ -13,7 +13,7 @@ const SERVER_PORT = 7001;
 const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
-  'large.txt': Buffer.alloc(10000000, 'a'),
+  'large.txt': Buffer.alloc(2000000, 'a'),
   'empty.txt': Buffer.from('')
 };
 
@@ -209,6 +209,7 @@ test('should respond 400 and close connection when sending partial request.', as
   const response = client.nextHttpResponse();
   expect(response.header.code).toBe('400');
 
+  expect(response.header.keyValues['Connection']).toBe('close');
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy()
 });
@@ -223,4 +224,29 @@ test('should end connection when the client close connection.', async () => {
 
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy()
+});
+
+test('should keep the connection when "Connection: close" is not in the request header.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.sendHttpGet('/', { Host: 'localhost' });
+  await waitForResponse();
+
+  const { header } = client.nextHttpResponse();
+  expect(header.keyValues['Connection']).toBeUndefined();
+  expect(client.isClosed).toBeFalsy();
+});
+
+test('should close the connection when "Connection: close" is in the request header.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.sendHttpGet('/', { Host: 'localhost', Connection: 'close' });
+  await waitForResponse();
+
+  const { header } = client.nextHttpResponse();
+  expect(header.keyValues['Connection']).toBe('close');
+  expect(client.isClosed).toBeTruthy();
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
