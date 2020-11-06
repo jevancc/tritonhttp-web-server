@@ -41,76 +41,64 @@ test('should respond correct content when client sends multiple requests and clo
   client.sendHttpGet('/testfile.txt', { Host: 'localhost' });
   await waitForResponse();
   const response1 = client.nextHttpResponse();
-  expect(response1.header.code).toBe('200');
-  expect(response1.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response1.body, DOC_MAP['testfile.txt'])).toBeTruthy();
+  expect(is200ResponseWithExpectedContentTypeAndBody(response1, 'text/plain', DOC_MAP['testfile.txt'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
 
   client.sendHttpGet('/index.html', { Host: 'localhost' });
   await waitForResponse();
   const response2 = client.nextHttpResponse();
-  expect(response2.header.code).toBe('200');
-  expect(response2.header.keyValues['Content-Length']).toBe(DOC_MAP['index.html'].length.toString());
-  expect(areBuffersEqual(response2.body, DOC_MAP['index.html'])).toBeTruthy();
+  expect(is200ResponseWithExpectedContentTypeAndBody(response2, 'text/html', DOC_MAP['index.html'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
 
   client.sendHttpGet('/long.txt', { Host: 'localhost' });
   await waitForResponse();
   const response3 = client.nextHttpResponse();
-  expect(response3.header.code).toBe('200');
-  expect(response3.header.keyValues['Content-Length']).toBe(DOC_MAP['long.txt'].length.toString());
-  expect(areBuffersEqual(response3.body, DOC_MAP['long.txt'])).toBeTruthy();
-
-  await waitForNextRequest();
+  expect(is200ResponseWithExpectedContentTypeAndBody(response3, 'text/plain', DOC_MAP['long.txt'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
 
   client.sendHttpGet('/short.txt', { Host: 'localhost' });
   await waitForResponse();
   const response4 = client.nextHttpResponse();
-  expect(response4.header.code).toBe('200');
-  expect(response4.header.keyValues['Content-Length']).toBe(DOC_MAP['short.txt'].length.toString());
-  expect(areBuffersEqual(response4.body, DOC_MAP['short.txt'])).toBeTruthy();
-
-  client.sendHttpGet('/???.txt', { Host: 'localhost' });
-  await waitForResponse();
-  const response5 = client.nextHttpResponse();
-  expect(response5.header.code).toBe('404');
+  expect(is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['short.txt'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
 
   await waitForServerTimeout();
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
+  
 });
 
-test('should respond correct contents and 404 when file does not exist', async () => {
+test('should respond 404 when file does not exist', async () => {
   const client = createClient();
   await client.connect();
 
   client.sendHttpGet('/testfile.txt', { Host: 'localhost' });
-  client.sendHttpGet('/index.html', { Host: 'localhost' });
-  client.sendHttpGet('/long.txt', { Host: 'localhost' });
-  client.sendHttpGet('/short.txt', { Host: 'localhost' });
+  await waitForResponse();
+  const response1 = client.nextHttpResponse();
+  expect(is200ResponseWithExpectedContentTypeAndBody(response1, 'text/plain', DOC_MAP['testfile.txt'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
+
+  client.sendHttpGet('/???.html', { Host: 'localhost' });
+  await waitForResponse();
+  const response2 = client.nextHttpResponse();
+  expect(is404Response(response2, false));
+  expect(client.isClosed).not.toBeTruthy();
+
   client.sendHttpGet('/???.txt', { Host: 'localhost' });
   await waitForResponse();
-
-  const response1 = client.nextHttpResponse();
-  expect(response1.header.code).toBe('200');
-  expect(response1.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response1.body, DOC_MAP['testfile.txt'])).toBeTruthy();
-
-  const response2 = client.nextHttpResponse();
-  expect(response2.header.code).toBe('200');
-  expect(response2.header.keyValues['Content-Length']).toBe(DOC_MAP['index.html'].length.toString());
-  expect(areBuffersEqual(response2.body, DOC_MAP['index.html'])).toBeTruthy();
-
   const response3 = client.nextHttpResponse();
-  expect(response3.header.code).toBe('200');
-  expect(response3.header.keyValues['Content-Length']).toBe(DOC_MAP['long.txt'].length.toString());
-  expect(areBuffersEqual(response3.body, DOC_MAP['long.txt'])).toBeTruthy();
-
+  expect(is404Response(response3, false));
+  expect(client.isClosed).not.toBeTruthy();
+  
+  client.sendHttpGet('/short.txt', { Host: 'localhost' });
+  await waitForResponse();
   const response4 = client.nextHttpResponse();
-  expect(response4.header.code).toBe('200');
-  expect(response4.header.keyValues['Content-Length']).toBe(DOC_MAP['short.txt'].length.toString());
-  expect(areBuffersEqual(response4.body, DOC_MAP['short.txt'])).toBeTruthy();
+  expect(is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['short.txt'], false)).toBeTruthy();
+  expect(client.isClosed).not.toBeTruthy();
 
-  const response5 = client.nextHttpResponse();
-  expect(response5.header.code).toBe('404');
+  await waitForServerTimeout();
+  expect(client.isClosed).toBeTruthy();
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
 
 test('should get the first response and close connection when the second request is malformed ', async () => {
@@ -118,17 +106,14 @@ test('should get the first response and close connection when the second request
   await client.connect();
 
   client.sendHttpGet('/testfile.txt', { Host: 'localhost' });
+  client.sendHttpGet('/index.html', { });
   await waitForResponse();
+
   const response1 = client.nextHttpResponse();
-  expect(response1.header.code).toBe('200');
-  expect(response1.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response1.body, DOC_MAP['testfile.txt'])).toBeTruthy();
-
-  client.sendHttpGet('index.html', { Host: 'localhost' });
-  await waitForResponse();
   const response2 = client.nextHttpResponse();
-  expect(response2.header.code).toBe('400');
-
+  
+  expect(is200ResponseWithExpectedContentTypeAndBody(response1, 'text/plain', DOC_MAP['testfile.txt'], false)).toBeTruthy();
+  expect(is400Response(response2)).toBeTruthy();
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
 });
@@ -138,23 +123,19 @@ test('should close connection when the request is malformed and not process the 
   await client.connect();
 
   client.sendHttpGet('/testfile.txt', { Host: 'localhost' });
+  client.sendHttpGet('/index.html', { });
   await waitForResponse();
+
   const response1 = client.nextHttpResponse();
-  expect(response1.header.code).toBe('200');
-  expect(response1.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response1.body, DOC_MAP['testfile.txt'])).toBeTruthy();
-
-  client.sendHttpGet('index.html', { Host: 'localhost' });
-  await waitForResponse();
-
   const response2 = client.nextHttpResponse();
-  expect(response2.header.code).toBe('400');
+  
+  expect(is200ResponseWithExpectedContentTypeAndBody(response1, 'text/plain', DOC_MAP['testfile.txt'], false)).toBeTruthy();
+  expect(is400Response(response2)).toBeTruthy();
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
 
-  client.sendHttpGet('/index.html', { Host: 'localhost' });
-  await waitForResponse();
-
+  client.sendHttpGet('/short.txt', { Host: 'localhost' });
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
+
 });
