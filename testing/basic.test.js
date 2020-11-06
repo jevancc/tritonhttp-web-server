@@ -93,10 +93,10 @@ describe('Bad Request', () => {
   test('should respond 400 when Host is not presented in request.', async () => {
     const client = createClient();
     await client.connect();
-  
+
     client.sendHttpGet('/', { Connection: 'close' });
     await waitForResponse();
-  
+
     const { header } = client.nextHttpResponse();
     expect(header.code).toBe('400');
     expect(header.description).toBe('Bad Request');
@@ -146,7 +146,6 @@ test('should respond 404 when file does not exist.', async () => {
   expect(header.description).toBe('Not Found');
 });
 
-
 test('should respond file content with correct content when requesting an empty file', async () => {
   const client = createClient();
   await client.connect();
@@ -192,7 +191,6 @@ test('should respond the existed file content with correct content when sending 
   expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
 
-
 test('should respond 400 and close connection when sending partial request.', async () => {
   const client = createClient();
   await client.connect();
@@ -204,6 +202,16 @@ test('should respond 400 and close connection when sending partial request.', as
   expect(response.header.code).toBe('400');
 
   expect(response.header.keyValues['Connection']).toBe('close');
+  expect(client.isClosed).toBeTruthy();
+  expect(client.isBufferEmpty()).toBeTruthy();
+});
+
+test('should close connection after timeout without response when no partial request sent.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  await waitForServerTimeout();
+
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
 });

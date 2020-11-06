@@ -67,15 +67,18 @@ In this file, we tested cases including: valid format, find valid files, and tim
 ### timeout/close
 
 1. should respond 400 and close connection when there is partial request.
-    - After a client connected to the server, the client sent a http request with a dangling header `\r\n`. We expected the response contained 400 with connection closed.
+    - After a client connected to the server, the client sent a partial http request and waited for the timeout. We expected the response contained 400 with connection closed.
 
-2. should end connection when the client close connection.
+2. should close connection after timeout without response when no partial request sent.
+    - After a client connected to the server, the client did nothing and waited for the timeout. We expected the sever closed the connection without sending anything to the client.
+
+3. should end connection when the client close connection.
     - After a client connected to the server, the client shut down the connection. We expected the connection was closed.
 
-3. should keep the connection when "Connection: close" is not in the request header.
+4. should keep the connection when "Connection: close" is not in the request header.
     - After a client connected to the server, the client sent a http request without "Connection: close" in header. We expected the connection was not closed.
 
-4. should close the connection when "Connection: close" is in the request header.
+5. should close the connection when "Connection: close" is in the request header.
     - After a client connected to the server, the client sent a http request with "Connection: close" in header. We expected the connection was closed and "Connection: close" is set in the response header.
 
 ## subdir.test.js
