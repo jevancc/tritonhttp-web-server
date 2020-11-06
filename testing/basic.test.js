@@ -48,7 +48,73 @@ test('should respond correct HTTP version in header.', async () => {
   expect(header.version).toBe('HTTP/1.1');
 });
 
-test('should respond 200 when file exists.', async () => {
+describe('Bad Request', () => {
+  test('should respond 400 when missing slash in URL.', async () => {
+    const client = createClient();
+    await client.connect();
+
+    client.sendHttpGet('testfile.txt', {
+      Host: 'localhost',
+      Connection: 'close',
+    });
+
+    await waitForResponse();
+    const response = client.nextHttpResponse();
+
+    expect(response.header.code).toBe('400');
+    expect(response.header.description).toBe('Bad Request');
+  });
+
+  test('should respond 400 when sending unspported HTTP version.', async () => {
+    // HTTP version other than 1.1
+    const client = createClient();
+    await client.connect();
+
+    client.sendHttp('GET', '/', 'HTTP/1.0', { Host: 'localhost', Connection: 'close' });
+    await waitForResponse();
+
+    const response = client.nextHttpResponse();
+    expect(response.header.code).toBe('400');
+    expect(response.header.description).toBe('Bad Request');
+  });
+
+  test('should respond 400 when sending unsupported HTTP method.', async () => {
+    // methods other than GET
+    const client = createClient();
+    await client.connect();
+
+    client.sendHttp('POST', '/', 'HTTP/1.1', { Host: 'localhost', Connection: 'close' });
+    await waitForResponse();
+
+    const response = client.nextHttpResponse();
+    expect(response.header.code).toBe('400');
+    expect(response.header.description).toBe('Bad Request');
+  });
+  test('should respond 400 when Host is not presented in request.', async () => {
+    const client = createClient();
+    await client.connect();
+  
+    client.sendHttpGet('/', { Connection: 'close' });
+    await waitForResponse();
+  
+    const { header } = client.nextHttpResponse();
+    expect(header.code).toBe('400');
+    expect(header.description).toBe('Bad Request');
+  });
+  test('should respond 400 when sending empty format request', async () => {
+    // send empty format
+    const client = createClient();
+    await client.connect();
+    client.send('\r\n');
+    await waitForResponse();
+
+    const response = client.nextHttpResponse();
+    expect(response.header.code).toBe('400');
+    expect(response.header.description).toBe('Bad Request');
+  });
+});
+
+test('should respond 200 and correct content when file exists.', async () => {
   const client = createClient();
   await client.connect();
 
@@ -58,9 +124,11 @@ test('should respond 200 when file exists.', async () => {
   });
   await waitForResponse();
 
-  const { header } = client.nextHttpResponse();
-  expect(header.code).toBe('200');
-  expect(header.description).toBe('OK');
+  const response = client.nextHttpResponse();
+
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
 
 test('should respond 404 when file does not exist.', async () => {
@@ -78,36 +146,8 @@ test('should respond 404 when file does not exist.', async () => {
   expect(header.description).toBe('Not Found');
 });
 
-test('should respond 400 when Host is not presented in request.', async () => {
-  const client = createClient();
-  await client.connect();
 
-  client.sendHttpGet('/', { Connection: 'close' });
-  await waitForResponse();
-
-  const { header } = client.nextHttpResponse();
-  expect(header.code).toBe('400');
-  expect(header.description).toBe('Bad Request');
-});
-
-test('should respond file content with correct content length when file exists.', async () => {
-  const client = createClient();
-  await client.connect();
-
-  client.sendHttpGet('/testfile.txt', {
-    Host: 'localhost',
-    Connection: 'close',
-  });
-  await waitForResponse();
-
-  const response = client.nextHttpResponse();
-
-  expect(response.header.code).toBe('200');
-  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
-  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
-});
-
-test('should respond file content with correct content length when requesting an empty file', async () => {
+test('should respond file content with correct content when requesting an empty file', async () => {
   const client = createClient();
   await client.connect();
 
@@ -152,61 +192,6 @@ test('should respond the existed file content with correct content when sending 
   expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
 
-describe('Bad Request', () => {
-  test('should respond 400 when missing slash in URL.', async () => {
-    const client = createClient();
-    await client.connect();
-
-    client.sendHttpGet('testfile.txt', {
-      Host: 'localhost',
-      Connection: 'close',
-    });
-
-    await waitForResponse();
-    const response = client.nextHttpResponse();
-
-    expect(response.header.code).toBe('400');
-    expect(response.header.description).toBe('Bad Request');
-  });
-
-  test('should respond 400 when sending unspported HTTP version.', async () => {
-    // HTTP version other than 1.1
-    const client = createClient();
-    await client.connect();
-
-    client.sendHttp('GET', '/', 'HTTP/1.0', { Host: 'localhost', Connection: 'close' });
-    await waitForResponse();
-
-    const response = client.nextHttpResponse();
-    expect(response.header.code).toBe('400');
-    expect(response.header.description).toBe('Bad Request');
-  });
-
-  test('should respond 400 when sending unsupported HTTP method.', async () => {
-    // methods other than GET
-    const client = createClient();
-    await client.connect();
-
-    client.sendHttp('POST', '/', 'HTTP/1.1', { Host: 'localhost', Connection: 'close' });
-    await waitForResponse();
-
-    const response = client.nextHttpResponse();
-    expect(response.header.code).toBe('400');
-    expect(response.header.description).toBe('Bad Request');
-  });
-
-  test('should respond 400 when sending empty request', async () => {
-    // send empty format
-    const client = createClient();
-    await client.connect();
-    client.send('\r\n');
-    await waitForResponse();
-
-    const response = client.nextHttpResponse();
-    expect(response.header.code).toBe('400');
-    expect(response.header.description).toBe('Bad Request');
-  });
-});
 
 test('should respond 400 and close connection when sending partial request.', async () => {
   const client = createClient();

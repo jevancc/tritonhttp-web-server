@@ -101,7 +101,7 @@ test('should respond 404 when file does not exist', async () => {
   expect(client.isBufferEmpty()).toBeTruthy();
 });
 
-test('should get the first response and close connection when the second request is malformed ', async () => {
+test('should close connection when the second request is malformed ', async () => {
   const client = createClient();
   await client.connect();
 

@@ -12,6 +12,9 @@ Thank you. -->
 We wrote out testing script in Node.js, and we devided the test cases into four files: `basic.test.js`, `subdir.test.js`, and `mime-types.test.js`, and `concurr-pipe.test.js`. 
 
 
+To set up this testing program, run the following command:
+`$ npm install`
+
 To run the test cases, run the following command:
 `$ npm run test`
 
@@ -22,20 +25,27 @@ In this file, we tested cases including: valid format, find valid files, and tim
 
 ### valid format
 
-1. should respond 400 when Slash Missing.
+1. should respond nothing when sending no request.
+    - After a client connected to the server, the client did nothing. We expected the connection was established and nothing in response.
+
+2. should respond correct HTTP version in header.
+    - After a client connected to the server, the client sent a http request of `/`. We expected the response header contained `HTTP/1.1` version.
+
+3. should respond 400 when Slash Missing.
     - After a client connected to the server, the client sent a http request with a `missing slash URL`. We expected the response contained 400 code.
 
-2. should respond 400 when HTTP/1.1 Missing.
+4. should respond 400 when sending unspported HTTP version.
     - After a client connected to the server, the client sent a http request with `HTTP/1.0` in initial line. We expected the response contained 400 code.
 
-3. should respond 400 when sending non-supported request format, ex. POST.
+5. sshould respond 400 when sending unsupported HTTP method.
     - After a client connected to the server, the client sent a http request with `POST` in initial line. We expected the response contained 400 code.
 
-4. should respond 400 when Host is not presented request.
+6. should respond 400 when Host is not presented request.
     - After a client connected to the server, the client sent a http request without `Host` in headers. We expected the response contained 400 code.
 
-5. should respond nothing when sending no request.
-    - After a client connected to the server, the client did nothing. We expected the connection was established and nothing in response.
+7. should respond 400 when sending empty format request.
+    - After a client connected to the server, the client sent a http request with only `\r\n` in initial line. We expected the response contained 400 code.
+
 
 ### find valid files
 
@@ -48,7 +58,10 @@ In this file, we tested cases including: valid format, find valid files, and tim
 3. should respond 200 and correct content when a large file exists.
     - After a client connected to the server, the client sent a http request of a large file (10 MB). We expected the response contained 200 code and correct large file content (10 MB).
 
-4. should respond the existed file content with correct content when there is a large request.
+4. should respond 200 and correct content when an empty file exists.
+    - After a client connected to the server, the client sent a http request of an empty file. We expected the response contained 200 code and correct empty content.
+
+5. should respond the existed file content with correct content when there is a large request.
     - After a client connected to the server, the client sent a http request with 100000 headers. We expected the response contained 200 code and correct file content.
 
 ### timeout/close
@@ -62,7 +75,7 @@ In this file, we tested cases including: valid format, find valid files, and tim
 3. should keep the connection when "Connection: close" is not in the request header.
     - After a client connected to the server, the client sent a http request without "Connection: close" in header. We expected the connection was not closed.
 
-3. should close the connection when "Connection: close" is in the request header.
+4. should close the connection when "Connection: close" is in the request header.
     - After a client connected to the server, the client sent a http request with "Connection: close" in header. We expected the connection was closed and "Connection: close" is set in the response header.
 
 ## subdir.test.js
@@ -106,26 +119,27 @@ In this file, we tested cases including: valid format, find valid files, and tim
     - After a client connected to the server, the client sent a http request with `/dir1/../../SERVER_ROOT/dir1/file1.txt` URL which escape doc root but traverse back to root. We expected the response contained 200 code and correct file content.
 
 
-## concurr-pipe.test.js
+## concurrency.test.js
 
-### concurrency
-
-1. should respond 200 and same modified time from different clients.
-    - After four clients connected to the server, each client sent a http request of different existed files. We expected the response contained 200 code and the same modified time from these clients.
+1. should respond file content with correct content when files exists.
+    - After four clients connected to the server, each client sent a http request of existed files. We expected the response contained 200 code and correct content for these clients.
 
 2. should respond 400 and close connections when there is malformed request.
-    - After four clients connected to the server, two clients sent a http request of different existed files and the others send malformed requests. We expected the response contained 200 code and the same modified time from correct request clients, and 400 from the others.
+    - After four clients connected to the server, two clients sent a http request of different existed files and the others sent malformed requests. We expected the response contained 200 code and correct content for correct request clients, and close connection with a 400 code response for the others.
 
-### pipeline
+## pipeline.test.js
 
 1. should respond correct content when a client send multiple requests and close connection after timeout.
-    - After a client connected to the server, the client sent five consecutive http requests within 5 seconds, which the last request was non existing file and the others were existed files, and the client waited until timeout. We expected response contained 200 code and correct file content, and the last response contained 404 code; the connection should closed eventually.
+    - After a client connected to the server, the client sent four consecutive http requests, and the client waited until timeout. We expected response contained 200 code and correct file content, and the connection should closed eventually.
 
-2. should respond 200 and correct content when file exists and close connection when the request is malformed.
-    - After a client connected to the server, the client sent two consecutive http requests, which the last request was malformed. We expected first response contained 200 code and correct file content; the last response contained 400 code and closed the connection. 
+2. should respond 404 when file does not exist
+    - After a client connected to the server, the client sent four consecutive http requests where two of which contained non-existed files, and the client waited until timeout. We expected response contained 200 code and correct file content for existed files and 404 code for non-existed fils, and the connection should closed eventually.
 
-3. should not process the next request after connection close.
-    - After a client connected to the server, the client sent three consecutive http requests, which the second request was malformed. We expected first response contained 200 code and correct file content; the second response contained 400 code and closed the connection, and while there was no response for the last request.
+3. should close connection when the second request is malformed .
+    - After a client connected to the server, the client sent two consecutive http requests, which the first one request an existed file and the last request was malformed. We expected first response contained 200 code and correct file content; the last response contained 400 code and closed the connection. 
+
+4. should not process the next request after connection close.
+    - After a client connected to the server, the client sent three consecutive http requests, while the second request was malformed and the others were existed files. We expected first response contained 200 code and correct file content; the second response contained 400 code and closed the connection, and while there was no response for the last request.
 
 
 ## mime-types.test.js

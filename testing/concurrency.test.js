@@ -33,7 +33,7 @@ afterAll(() => {
   server.cleanup();
 });
 
-test('should respond 200 and same modified time from different clients.', async () => {
+test('should respond file content with correct content when files exists.', async () => {
   const client1 = createClient();
   const client2 = createClient();
   const client3 = createClient();
