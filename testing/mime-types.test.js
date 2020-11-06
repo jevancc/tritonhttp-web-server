@@ -6,14 +6,18 @@ const { mimeTypes } = require('./libs/mime');
 jest.setTimeout(100000);
 
 const SERVER_PORT = 7002;
-const DOC_MAP = Object.keys(mimeTypes).reduce((docs, ext) => ({
-  ...docs,
-  [`test${ext}`]: Buffer.from(`This is a ${ext} file`),
-}), {
-  'test.xxxx': Buffer.from('Unknown ext file'),
-});
+const DOC_MAP = Object.keys(mimeTypes).reduce(
+  (docs, ext) => ({
+    ...docs,
+    [`test${ext}`]: Buffer.from(`This is a ${ext} file`),
+  }),
+  {
+    'test.xxxx': Buffer.from('Unknown ext file'),
+  }
+);
 
-let server, createClient;
+let server;
+let createClient;
 
 beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
@@ -51,7 +55,7 @@ test('should respond with content-type (pipeline & comprehensive)', async () => 
   const client = createClient();
   await client.connect();
 
-  Object.keys(DOC_MAP).map(file => client.sendHttpGet(`/${file}`, { Host: 'localhost' }));
+  Object.keys(DOC_MAP).map((file) => client.sendHttpGet(`/${file}`, { Host: 'localhost' }));
   await waitForResponse();
   await waitForResponse();
 
@@ -65,5 +69,3 @@ test('should respond with content-type (pipeline & comprehensive)', async () => 
     expect(areBuffersEqual(response.body, content)).toBeTruthy();
   });
 });
-
-

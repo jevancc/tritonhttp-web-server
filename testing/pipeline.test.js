@@ -18,10 +18,11 @@ const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
   'long.txt': Buffer.alloc(1000000, 'a'),
-  'short.txt': Buffer.from('.')
+  'short.txt': Buffer.from('.'),
 };
 
-let server, createClient;
+let server;
+let createClient;
 
 beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
@@ -74,8 +75,7 @@ test('should respond correct content when a client send multiple requests and cl
 
   await waitForServerTimeout();
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
-
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
 
 test('should respond correct contents and 404 when file does not exist', async () => {
@@ -94,12 +94,10 @@ test('should respond correct contents and 404 when file does not exist', async (
   expect(response1.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
   expect(areBuffersEqual(response1.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 
-
   const response2 = client.nextHttpResponse();
   expect(response2.header.code).toBe('200');
   expect(response2.header.keyValues['Content-Length']).toBe(DOC_MAP['index.html'].length.toString());
   expect(areBuffersEqual(response2.body, DOC_MAP['index.html'])).toBeTruthy();
-
 
   const response3 = client.nextHttpResponse();
   expect(response3.header.code).toBe('200');
@@ -132,8 +130,7 @@ test('should get the first response and close connection when the second request
   expect(response2.header.code).toBe('400');
 
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
-
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
 
 test('should close connection when the request is malformed and not process the next request', async () => {
@@ -153,11 +150,11 @@ test('should close connection when the request is malformed and not process the 
   const response2 = client.nextHttpResponse();
   expect(response2.header.code).toBe('400');
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
+  expect(client.isBufferEmpty()).toBeTruthy();
 
   client.sendHttpGet('/index.html', { Host: 'localhost' });
   await waitForResponse();
 
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
+  expect(client.isBufferEmpty()).toBeTruthy();
 });

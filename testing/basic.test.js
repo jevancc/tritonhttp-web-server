@@ -14,10 +14,11 @@ const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
   'large.txt': Buffer.alloc(2000000, 'a'),
-  'empty.txt': Buffer.from('')
+  'empty.txt': Buffer.from(''),
 };
 
-let server, createClient;
+let server;
+let createClient;
 
 beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
@@ -36,7 +37,6 @@ test('should connect to server and respond nothing when sending nothing.', async
   expect(client.isReady).toBeTruthy();
 });
 
-
 test('should respond correct HTTP version in header.', async () => {
   const client = createClient();
   await client.connect();
@@ -52,7 +52,10 @@ test('should respond 200 when file exists.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/testfile.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const { header } = client.nextHttpResponse();
@@ -64,7 +67,10 @@ test('should respond 404 when file does not exist.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/NOT_EXIST.TXT', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/NOT_EXIST.TXT', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const { header } = client.nextHttpResponse();
@@ -88,7 +94,10 @@ test('should respond file content with correct content length when file exists.'
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/testfile.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const response = client.nextHttpResponse();
@@ -144,12 +153,14 @@ test('should respond the existed file content with correct content when sending 
 });
 
 describe('Bad Request', () => {
-
   test('should respond 400 when missing slash in URL.', async () => {
     const client = createClient();
     await client.connect();
 
-    client.sendHttpGet('testfile.txt', { Host: 'localhost', Connection: 'close' });
+    client.sendHttpGet('testfile.txt', {
+      Host: 'localhost',
+      Connection: 'close',
+    });
 
     await waitForResponse();
     const response = client.nextHttpResponse();
@@ -172,7 +183,6 @@ describe('Bad Request', () => {
   });
 
   test('should respond 400 when sending unsupported request format.', async () => {
-
     // methods other than GET
     const client = createClient();
     await client.connect();
@@ -196,7 +206,6 @@ describe('Bad Request', () => {
     expect(response.header.code).toBe('400');
     expect(response.header.description).toBe('Bad Request');
   });
-
 });
 
 test('should respond 400 and close connection when sending partial request.', async () => {
@@ -211,7 +220,7 @@ test('should respond 400 and close connection when sending partial request.', as
 
   expect(response.header.keyValues['Connection']).toBe('close');
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
 
 test('should end connection when the client close connection.', async () => {
@@ -223,7 +232,7 @@ test('should end connection when the client close connection.', async () => {
   await client.connect();
 
   expect(client.isClosed).toBeTruthy();
-  expect(client.isBufferEmpty()).toBeTruthy()
+  expect(client.isBufferEmpty()).toBeTruthy();
 });
 
 test('should keep the connection when "Connection: close" is not in the request header.', async () => {

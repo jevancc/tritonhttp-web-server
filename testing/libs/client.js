@@ -2,15 +2,9 @@ const net = require('net');
 
 class TritonHTTPTestClient {
   constructor(config = {}, handlers = {}) {
-    const {
-      ip = 'localhost',
-      port = 8080,
-    } = config;
+    const { ip = 'localhost', port = 8080 } = config;
 
-    const {
-      timeoutHandler = () => { },
-      endHandler = () => { },
-    } = handlers;
+    const { timeoutHandler = () => {}, endHandler = () => {} } = handlers;
 
     this.ip = ip;
     this.port = port;
@@ -20,11 +14,11 @@ class TritonHTTPTestClient {
     this.isReady = false;
     this.isClosed = false;
 
-    this.socket.on('ready', () => this.isReady = true);
-    this.socket.on('data', (buf) => this.databuf = Buffer.concat([this.databuf, buf]));
+    this.socket.on('ready', () => (this.isReady = true));
+    this.socket.on('data', (buf) => (this.databuf = Buffer.concat([this.databuf, buf])));
     this.socket.on('timeout', timeoutHandler);
     this.socket.on('end', endHandler);
-    this.socket.on('close', () => this.isClosed = true);
+    this.socket.on('close', () => (this.isClosed = true));
   }
 
   isBufferEmpty() {
@@ -53,28 +47,31 @@ class TritonHTTPTestClient {
   }
 
   sendHttpGet(file, headers) {
-    const data = [
-      `GET ${file.trim()} HTTP/1.1`,
-      ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
-    ].join('\r\n') + '\r\n\r\n';
+    const data =
+      [
+        `GET ${file.trim()} HTTP/1.1`,
+        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+      ].join('\r\n') + '\r\n\r\n';
 
     this.send(data);
   }
 
   sendPartialGet(file, headers) {
-    const data = [
-      `GET ${file.trim()} HTTP/1.1`,
-      ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
-    ].join('\r\n') + '\r\n';
+    const data =
+      [
+        `GET ${file.trim()} HTTP/1.1`,
+        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+      ].join('\r\n') + '\r\n';
 
     this.send(data);
   }
 
   sendHttpGet_adj(action, file, headers, http_v) {
-    const data = [
-      `${action} ${file.trim()} ${http_v}`,
-      ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
-    ].join('\r\n') + '\r\n\r\n';
+    const data =
+      [
+        `${action} ${file.trim()} ${http_v}`,
+        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+      ].join('\r\n') + '\r\n\r\n';
 
     this.send(data);
   }
@@ -83,7 +80,7 @@ class TritonHTTPTestClient {
     const buf = this.databuf;
 
     for (let i = 0; i < Math.min(buf.length - 1, 256); i++) {
-      if (buf[i] == 0xD && buf[i + 1] == 0xA /* \r\n */) {
+      if (buf[i] == 0xd && buf[i + 1] == 0xa /* \r\n */) {
         const header = buf.slice(0, i).toString();
         this.databuf = buf.slice(i + 2);
 
@@ -102,13 +99,13 @@ class TritonHTTPTestClient {
   nextHttpHeaderKeyValue() {
     const buf = this.databuf;
 
-    if (buf.length >= 2 && buf[0] == 0xD && buf[1] == 0xA) {
+    if (buf.length >= 2 && buf[0] == 0xd && buf[1] == 0xa) {
       /* empty line with <CR><LF> only */
       this.databuf = this.databuf.slice(2);
       return null;
     } else {
       for (let i = 0; i < Math.min(buf.length - 1, 256); i++) {
-        if (buf[i] == 0xD && buf[i + 1] == 0xA /* \r\n */) {
+        if (buf[i] == 0xd && buf[i + 1] == 0xa /* \r\n */) {
           const keyValueStr = buf.slice(0, i).toString();
           this.databuf = buf.slice(i + 2);
 

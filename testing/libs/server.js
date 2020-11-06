@@ -55,12 +55,7 @@ function runServer(config = {}) {
 module.exports.runServer = runServer;
 
 function createTempServerConfigFile(config = {}) {
-  const {
-    useDefaultServer,
-    port,
-    docRoot,
-    mimeTypes,
-  } = config;
+  const { useDefaultServer, port, docRoot, mimeTypes } = config;
 
   const configFile = tmp.fileSync({
     discardDescriptor: true,

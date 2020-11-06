@@ -7,22 +7,23 @@ const SERVER_PORT = 7003;
 const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'root.txt': Buffer.from('This is the file1'),
-  'dir1': {
+  dir1: {
     'index.html': Buffer.from('Index file of dir1'),
     'file1.txt': Buffer.from('This is the file1'),
-    'dir11': {
+    dir11: {
       'file11.txt': Buffer.from('This is the file1'),
     },
-    'dir12': {
+    dir12: {
       'file12.txt': Buffer.from('This is the file12'),
-    }
+    },
   },
-  'dir2': {
+  dir2: {
     'file2.txt': Buffer.from('This is the file2'),
-  }
+  },
 };
 
-let server, createClient;
+let server;
+let createClient;
 
 beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
@@ -57,7 +58,10 @@ test('should respond 200 when file exists in subdir.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/file1.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/file1.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const content = DOC_MAP['dir1']['file1.txt'];
@@ -70,7 +74,10 @@ test('should respond 404 when file does not exists in subdir.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/file100.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/file100.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const { header } = client.nextHttpResponse();
@@ -118,7 +125,10 @@ test('should support relative path.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../root.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../root.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const content = DOC_MAP['root.txt'];
@@ -131,7 +141,10 @@ test('should support relative path traversal.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../dir2/file2.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../dir2/file2.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const content = DOC_MAP['dir2']['file2.txt'];
@@ -144,7 +157,10 @@ test('should support complicated relative path traversal.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../dir2/../dir1/dir11/../dir12/../../root.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../dir2/../dir1/dir11/../dir12/../../root.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const content = DOC_MAP['root.txt'];
@@ -157,31 +173,38 @@ test('should respond 404 when path escape document root.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../../', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../../', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const { header } = client.nextHttpResponse();
   expect(header.code).toBe('404');
 });
-
 
 test('should respond 404 when path escape document root (escape filesystem root).', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../../../../../../../../../../../../../../../../', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../../../../../../../../../../../../../../../../', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const { header } = client.nextHttpResponse();
   expect(header.code).toBe('404');
 });
 
-
 test('should support escape doc root and traverse back to root.', async () => {
   const client = createClient();
   await client.connect();
 
-  client.sendHttpGet('/dir1/../../SERVER_ROOT/dir1/file1.txt', { Host: 'localhost', Connection: 'close' });
+  client.sendHttpGet('/dir1/../../SERVER_ROOT/dir1/file1.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const content = DOC_MAP['dir1']['file1.txt'];

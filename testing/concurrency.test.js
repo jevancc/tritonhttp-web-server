@@ -17,10 +17,11 @@ const DOC_MAP = {
   'index.html': Buffer.from('Hello World'),
   'testfile.txt': Buffer.from('This is the testfile!!!'),
   'long.txt': Buffer.alloc(1000000, 'a'),
-  'short.txt': Buffer.from('.')
+  'short.txt': Buffer.from('.'),
 };
 
-let server, createClient;
+let server;
+let createClient;
 
 beforeAll(async () => {
   server = runServer({ port: SERVER_PORT, docMap: DOC_MAP });
@@ -43,10 +44,16 @@ test('should respond 200 and same modified time from different clients.', async 
   await client3.connect();
   await client4.connect();
 
-  client1.sendHttpGet('/index.html', { Host: 'localhost', Connection: 'close' });
+  client1.sendHttpGet('/index.html', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   client2.sendHttpGet('/long.txt', { Host: 'localhost', Connection: 'close' });
   client3.sendHttpGet('/short.txt', { Host: 'localhost' });
-  client4.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  client4.sendHttpGet('/testfile.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const response1 = client1.nextHttpResponse();
@@ -56,8 +63,12 @@ test('should respond 200 and same modified time from different clients.', async 
 
   expect(is200ResponseWithExpectedContentTypeAndBody(response1, 'text/html', DOC_MAP['index.html'], true)).toBeTruthy();
   expect(is200ResponseWithExpectedContentTypeAndBody(response2, 'text/plain', DOC_MAP['long.txt'], true)).toBeTruthy();
-  expect(is200ResponseWithExpectedContentTypeAndBody(response3, 'text/plain', DOC_MAP['short.txt'], false)).toBeTruthy();
-  expect(is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['testfile.txt'], true)).toBeTruthy();
+  expect(
+    is200ResponseWithExpectedContentTypeAndBody(response3, 'text/plain', DOC_MAP['short.txt'], false)
+  ).toBeTruthy();
+  expect(
+    is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['testfile.txt'], true)
+  ).toBeTruthy();
 
   expect(client1.isClosed).toBeTruthy();
   expect(client1.isBufferEmpty()).toBeTruthy();
@@ -79,10 +90,16 @@ test('should respond 400 and close connections when there is malformed request',
   await client3.connect();
   await client4.connect();
 
-  client1.sendHttpGet('/index.html', { Host: 'localhost', Connection: 'close' });
+  client1.sendHttpGet('/index.html', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   client2.sendHttpGet('long.txt', { Host: 'localhost', Connection: 'close' });
   client3.sendHttpGet('short.txt', { Host: 'localhost', Connection: 'close' });
-  client4.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
+  client4.sendHttpGet('/testfile.txt', {
+    Host: 'localhost',
+    Connection: 'close',
+  });
   await waitForResponse();
 
   const response1 = client1.nextHttpResponse();
@@ -101,7 +118,9 @@ test('should respond 400 and close connections when there is malformed request',
   expect(client3.isBufferEmpty()).toBeTruthy();
 
   const response4 = client4.nextHttpResponse();
-  expect(is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['testfile.txt'], true)).toBeTruthy();
+  expect(
+    is200ResponseWithExpectedContentTypeAndBody(response4, 'text/plain', DOC_MAP['testfile.txt'], true)
+  ).toBeTruthy();
   expect(client4.isClosed).toBeTruthy();
   expect(client4.isBufferEmpty()).toBeTruthy();
 });
