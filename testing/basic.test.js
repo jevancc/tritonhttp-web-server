@@ -120,10 +120,13 @@ test('should respond file content with correct content length when requesting a 
 test('should respond the existed file content with correct content when sending large request header.', async () => {
   const client = createClient();
   await client.connect();
-  const headerKeyValues = {};
-  for (let i = 0; i < 100000; i++) {
+  const headerKeyValues = {
+    Host: 'localhost',
+  };
+  for (let i = 0; i < 1000; i++) {
     headerKeyValues[`KEY_${i}`] = `VALUE_${i}`;
   }
+
   client.sendHttpGet('/testfile.txt', headerKeyValues);
   await waitForBigResponse();
 

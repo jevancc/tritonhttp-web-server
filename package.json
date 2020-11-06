@@ -11,7 +11,7 @@
     "go:setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
     "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
     "kill": "npx kill-port",
-    "kill:test": "npx kill-port 7001 7002 7003",
+    "kill:test": "npx kill-port 7001 7002 7003 7004 7005",
     "kill:all": "npx kill-port 8080 && npm run kill:test"
   },
   "testing": {
