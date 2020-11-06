@@ -4,10 +4,10 @@
   "description": "TritonHTTP Web Server",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:setup && npm run kill:test && jest testing --config=jest.config.js --runInBand",
+    "test": "npm run test:setup && npm run kill:test && npx jest testing --config=jest.config.js --runInBand",
     "test:setup": "npm run go:setup",
     "test:start-server": "GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go",
-    "lint": "go fmt ./src/tritonhttp/ ./src/main &&  prettier testing/**/*.{js,text.js} --write && eslint testing/**/*.{js,text.js} --fix",
+    "lint": "go fmt ./src/tritonhttp/ ./src/main && npx prettier testing/**/*.{js,text.js} --write && npx eslint testing/**/*.{js,text.js} --fix",
     "go:setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
     "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
     "kill": "npx kill-port",
