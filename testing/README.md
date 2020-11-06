@@ -25,7 +25,7 @@ In this file, we tested cases including: valid format, find valid files, and tim
 
 ### valid format
 
-1. should respond nothing when sending no request.
+1. should respond nothing when sending nothing.
     - After a client connected to the server, the client did nothing. We expected the connection was established and nothing in response.
 
 2. should respond correct HTTP version in header.
