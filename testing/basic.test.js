@@ -1,5 +1,11 @@
 const { runServer } = require('./libs/server');
-const { waitForServerStart, waitForResponse, waitForBigResponse, areBuffersEqual, waitForServerTimeout } = require('./libs/utils');
+const {
+  areBuffersEqual,
+  waitForBigResponse,
+  waitForServerStart,
+  waitForServerTimeout,
+  waitForResponse,
+} = require('./libs/utils');
 
 jest.setTimeout(100000);
 
@@ -38,7 +44,7 @@ test('should respond correct HTTP version in header.', async () => {
   client.sendHttpGet('/', { Host: 'localhost', Connection: 'close' });
   await waitForResponse();
 
-  const header = client.nextHttpHeader();
+  const { header } = client.nextHttpResponse();
   expect(header.version).toBe('HTTP/1.1');
 });
 
@@ -49,7 +55,7 @@ test('should respond 200 when file exists.', async () => {
   client.sendHttpGet('/testfile.txt', { Host: 'localhost', Connection: 'close' });
   await waitForResponse();
 
-  const header = client.nextHttpHeader();
+  const { header } = client.nextHttpResponse();
   expect(header.code).toBe('200');
   expect(header.description).toBe('OK');
 });
@@ -61,7 +67,7 @@ test('should respond 404 when file does not exist.', async () => {
   client.sendHttpGet('/NOT_EXIST.TXT', { Host: 'localhost', Connection: 'close' });
   await waitForResponse();
 
-  const header = client.nextHttpHeader();
+  const { header } = client.nextHttpResponse();
   expect(header.code).toBe('404');
   expect(header.description).toBe('Not Found');
 });
@@ -73,7 +79,7 @@ test('should respond 400 when Host is not presented in request.', async () => {
   client.sendHttpGet('/', { Connection: 'close' });
   await waitForResponse();
 
-  const header = client.nextHttpHeader();
+  const { header } = client.nextHttpResponse();
   expect(header.code).toBe('400');
   expect(header.description).toBe('Bad Request');
 });
@@ -86,6 +92,7 @@ test('should respond file content with correct content length when file exists.'
   await waitForResponse();
 
   const response = client.nextHttpResponse();
+
   expect(response.header.code).toBe('200');
   expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
   expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
@@ -191,7 +198,6 @@ describe('Bad Request', () => {
   });
 
 });
-
 
 test('should respond 400 and close connection when sending partial request.', async () => {
   const client = createClient();
