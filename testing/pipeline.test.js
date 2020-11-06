@@ -34,7 +34,7 @@ afterAll(() => {
   server.cleanup();
 });
 
-test('should respond correct content when a client send multiple requests and close connection after timeout', async () => {
+test('should respond correct content when client sends multiple requests and closes connection after timeout', async () => {
   const client = createClient();
   await client.connect();
 

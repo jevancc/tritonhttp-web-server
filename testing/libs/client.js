@@ -46,34 +46,28 @@ class TritonHTTPTestClient {
     this.socket.write(data);
   }
 
+  sendHttp(method, file, version, headers) {
+    const data =
+      [
+        `${method} ${file.trim()} ${version}`,
+        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
+      ].join('\r\n') + '\r\n\r\n';
+
+    this.send(data);
+  }
+
   sendHttpGet(file, headers) {
+    this.sendHttp('GET', file, 'HTTP/1.1', headers);
+  }
+
+  sendPartialHTTPGet(file, headers) {
     const data =
       [
         `GET ${file.trim()} HTTP/1.1`,
         ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
       ].join('\r\n') + '\r\n\r\n';
 
-    this.send(data);
-  }
-
-  sendPartialGet(file, headers) {
-    const data =
-      [
-        `GET ${file.trim()} HTTP/1.1`,
-        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
-      ].join('\r\n') + '\r\n';
-
-    this.send(data);
-  }
-
-  sendHttpGet_adj(action, file, headers, http_v) {
-    const data =
-      [
-        `${action} ${file.trim()} ${http_v}`,
-        ...Object.entries(headers).map(([key, value]) => `${key.trim()}: ${value.trim()}`),
-      ].join('\r\n') + '\r\n\r\n';
-
-    this.send(data);
+    this.send(data.slice(parseInt(data.length / 2)));
   }
 
   nextHttpHeaderInitialLine() {

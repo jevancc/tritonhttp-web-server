@@ -174,7 +174,7 @@ describe('Bad Request', () => {
     const client = createClient();
     await client.connect();
 
-    client.sendHttpGet_adj('GET', '/', { Host: 'localhost', Connection: 'close' }, 'HTTP/1.0');
+    client.sendHttp('GET', '/', 'HTTP/1.0', { Host: 'localhost', Connection: 'close' });
     await waitForResponse();
 
     const response = client.nextHttpResponse();
@@ -182,12 +182,12 @@ describe('Bad Request', () => {
     expect(response.header.description).toBe('Bad Request');
   });
 
-  test('should respond 400 when sending unsupported request format.', async () => {
+  test('should respond 400 when sending unsupported HTTP method.', async () => {
     // methods other than GET
     const client = createClient();
     await client.connect();
 
-    client.sendHttpGet_adj('POST', '/', { Host: 'localhost', Connection: 'close' }, 'HTTP/1.1');
+    client.sendHttp('POST', '/', 'HTTP/1.1', { Host: 'localhost', Connection: 'close' });
     await waitForResponse();
 
     const response = client.nextHttpResponse();
@@ -212,7 +212,7 @@ test('should respond 400 and close connection when sending partial request.', as
   const client = createClient();
   await client.connect();
 
-  client.sendPartialGet('/testfile.txt', { Host: 'localhost' });
+  client.sendPartialHTTPGet('/testfile.txt', { Host: 'localhost' });
   await waitForServerTimeout();
 
   const response = client.nextHttpResponse();

@@ -14,7 +14,7 @@ module.exports = {
   'rules': {
     'object-curly-spacing': ['error', 'always'],
     'no-unused-vars': 'off',
-    'max-len': ['error', { 'code': 120 }],
+    'max-len': 'off',
     'require-jsdoc': 'off',
   },
 };
