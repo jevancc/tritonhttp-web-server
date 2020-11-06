@@ -9,11 +9,13 @@ indicate within your code or write-up which tests are associated with each rubri
 Thank you. -->
 
 # Testing Strategies
-We wrote out testing script in Node.js, and we devided the test cases into four files: ```basic.test.js```, ```subdir.test.js```, and ```mime-types.test.js```, and ```concurr-pipe.test.js```. 
+We wrote out testing script in Node.js, and we devided the test cases into four files: `basic.test.js`, `subdir.test.js`, and `mime-types.test.js`, and `concurr-pipe.test.js`. 
 
 
-To run the test cases run the following command:
-```$ npm test```
+To run the test cases, run the following command:
+`$ npm run test`
+
+The testing result is stored in `report.html`.
 
 ## basic.test.js
 In this file, we tested cases including: valid format, find valid files, and timeout/close.
@@ -21,16 +23,16 @@ In this file, we tested cases including: valid format, find valid files, and tim
 ### valid format
 
 1. should respond 400 when Slash Missing.
-    - After a client connected to the server, the client sent a http request with a ```missing slash URL```. We expected the response contained 400 code.
+    - After a client connected to the server, the client sent a http request with a `missing slash URL`. We expected the response contained 400 code.
 
 2. should respond 400 when HTTP/1.1 Missing.
-    - After a client connected to the server, the client sent a http request with ```HTTP/1.0``` in initial line. We expected the response contained 400 code.
+    - After a client connected to the server, the client sent a http request with `HTTP/1.0` in initial line. We expected the response contained 400 code.
 
 3. should respond 400 when sending non-supported request format, ex. POST.
-    - After a client connected to the server, the client sent a http request with ```POST``` in initial line. We expected the response contained 400 code.
+    - After a client connected to the server, the client sent a http request with `POST` in initial line. We expected the response contained 400 code.
 
 4. should respond 400 when Host is not presented request.
-    - After a client connected to the server, the client sent a http request without ```Host``` in headers. We expected the response contained 400 code.
+    - After a client connected to the server, the client sent a http request without `Host` in headers. We expected the response contained 400 code.
 
 5. should respond nothing when sending no request.
     - After a client connected to the server, the client did nothing. We expected the connection was established and nothing in response.
@@ -52,7 +54,7 @@ In this file, we tested cases including: valid format, find valid files, and tim
 ### timeout/close
 
 1. should respond 400 and close connection when there is partial request.
-    - After a client connected to the server, the client sent a http request with a dangling header ```\r\n```. We expected the response contained 400 with connection closed.
+    - After a client connected to the server, the client sent a http request with a dangling header `\r\n`. We expected the response contained 400 with connection closed.
 
 2. should end connection when the client close connection.
     - After a client connected to the server, the client shut down the connection. We expected the connection was closed.
@@ -80,28 +82,28 @@ In this file, we tested cases including: valid format, find valid files, and tim
     - After a client connected to the server, the client sent a http request of a file in a non-existed subdirectory. We expected the response contained 404 code.
 
 5. should redirect to index.html when path is a dir.
-    - After a client connected to the server, the client sent a http request of directory URL. We expected the response contained 200 code and correct file content of ```index.html```.
+    - After a client connected to the server, the client sent a http request of directory URL. We expected the response contained 200 code and correct file content of `index.html`.
 
 6. should redirect to subdir/index.html when path is a subdir.
-    - After a client connected to the server, the client sent a http request of subdirectory URL. We expected the response contained 200 code and correct file content of ```subdir/index.html```.
+    - After a client connected to the server, the client sent a http request of subdirectory URL. We expected the response contained 200 code and correct file content of `subdir/index.html`.
 
 7. should support relative path.
-    - After a client connected to the server, the client sent a http request with ```/dir1/../root.txt``` URL. We expected the response contained 200 code and correct file content.
+    - After a client connected to the server, the client sent a http request with `/dir1/../root.txt` URL. We expected the response contained 200 code and correct file content.
 
 8. should support relative path traversal.
-    - After a client connected to the server, the client sent a http request with ```/dir1/../dir2/file2.txt``` URL. We expected the response contained 200 code and correct file content.
+    - After a client connected to the server, the client sent a http request with `/dir1/../dir2/file2.txt` URL. We expected the response contained 200 code and correct file content.
 
 9. should support complicated relative path traversal.
-    - After a client connected to the server, the client sent a http request with ```/dir1/../dir2/../dir1/dir11/../dir12/../../root.txt``` URL. We expected the response contained 200 code and correct file content.
+    - After a client connected to the server, the client sent a http request with `/dir1/../dir2/../dir1/dir11/../dir12/../../root.txt` URL. We expected the response contained 200 code and correct file content.
 
 10. should respond 404 when path escape document root.
-    - After a client connected to the server, the client sent a http request with ```/dir1/../../``` URL which escaped the document root. We expected the response contained 404 code.
+    - After a client connected to the server, the client sent a http request with `/dir1/../../` URL which escaped the document root. We expected the response contained 404 code.
 
 11. should respond 404 when path escape document root (escape filesystem root).
-    - After a client connected to the server, the client sent a http request with ```/dir1/../../../../../../../../../../../../../../../../``` URL which escaped the filesystem root. We expected the response contained 404 code.
+    - After a client connected to the server, the client sent a http request with `/dir1/../../../../../../../../../../../../../../../../` URL which escaped the filesystem root. We expected the response contained 404 code.
 
 12. should support escape doc root and traverse back to root.
-    - After a client connected to the server, the client sent a http request with ```/dir1/../../SERVER_ROOT/dir1/file1.txt``` URL which escape doc root but traverse back to root. We expected the response contained 200 code and correct file content.
+    - After a client connected to the server, the client sent a http request with `/dir1/../../SERVER_ROOT/dir1/file1.txt` URL which escape doc root but traverse back to root. We expected the response contained 200 code and correct file content.
 
 
 ## concurr-pipe.test.js
@@ -131,10 +133,10 @@ In this file, we tested cases including: valid format, find valid files, and tim
 ### support all MIME types
 
 1. should respond with content-type (basic).
-    - After a client connected to the server, the client sent a valid http request of ```/test.zip```. We expected the response contained correct content-type.
+    - After a client connected to the server, the client sent a valid http request of `/test.zip`. We expected the response contained correct content-type.
 
 2. should respond content-type for unknown file extension.
-    - After a client connected to the server, the client sent a valid http request of non-supported type ```/test.xxxx```. We expected the response respond correct content-type as ```application/octet-stream```.
+    - After a client connected to the server, the client sent a valid http request of non-supported type `/test.xxxx`. We expected the response respond correct content-type as `application/octet-stream`.
 
 3. should respond with content-type (pipeline & comprehensive), i.e., all the data types in MIME types.
     - After a client connected to the server, the client sent valid http requests of all data type in MIME. We expected the response respond correct content-type and content.
