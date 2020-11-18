@@ -85,12 +85,12 @@ function createTempDocDir(docMap) {
 
   const build = (docs, prefix) => {
     for (const [name, content] of Object.entries(docs)) {
-      if (content instanceof Object) {
-        shell.mkdir('-p', getPath(...prefix, name));
-        build(content, [...prefix, name]);
-      } else {
+      if (content instanceof Buffer || typeof content === 'string') {
         const fileName = getPath(...prefix, name);
         fs.writeFileSync(fileName, content);
+      } else {
+        shell.mkdir('-p', getPath(...prefix, name));
+        build(content, [...prefix, name]);
       }
     }
   };
