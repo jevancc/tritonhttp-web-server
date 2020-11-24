@@ -104,15 +104,11 @@ describe('Bad Request', () => {
   test('should respond 400 when Host is malformed ', async () => {
     const client = createClient();
     await client.connect();
-  
-    client.send([
-      'GET /index.html HTTP/1.1',
-      'Hostlocalhost',
-      '\r\n'
-    ].join('\r\n'))
+
+    client.send(['GET /index.html HTTP/1.1', 'Hostlocalhost', '\r\n'].join('\r\n'));
 
     await waitForResponse();
-  
+
     const { header } = client.nextHttpResponse();
     expect(header.code).toBe('400');
     expect(header.description).toBe('Bad Request');
