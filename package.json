@@ -4,12 +4,13 @@
   "description": "TritonHTTP Web Server",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:setup && npm run kill:test && npx jest testing --config=jest.config.js --runInBand",
-    "test:setup": "npm run go:setup",
-    "test:start-server": "GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go",
+    "test": "npm run setup:test && npm run kill:test && npx jest testing --config=jest.config.js --runInBand",
+    "test:basic": "npm run setup:test && npm run kill:test && npx jest testing/basic.test.js --config=jest.config.js --runInBand",
+    "setup:test": "npm run setup",
+    "start:test": "GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go",
     "lint": "go fmt ./src/tritonhttp/ ./src/main && npx prettier testing/**/*.{js,text.js} --write && npx eslint testing/**/*.{js,text.js} --fix",
-    "go:setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
-    "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
+    "setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
+    "start": "npm run setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
     "kill": "npx fkill-cli --force --silent",
     "kill:test": "npx fkill-cli --force --silent :7001 :7002 :7003 :7004 :7005",
     "kill:all": "npx fkill-cli --force --silent :8080 && npm run kill:test"

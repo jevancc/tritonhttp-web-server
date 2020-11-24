@@ -24,7 +24,7 @@ function runServer(config = {}) {
     mimeTypes,
   });
 
-  const serverProcess = shell.exec(`npm run test:start-server -- ${configFile.name}`, {
+  const serverProcess = shell.exec(`npm run start:test -- ${configFile.name}`, {
     cwd: path.join(__dirname, '../../'),
     silent: true,
     async: true,
