@@ -155,7 +155,6 @@ test('should respond 200 and correct content when file exists.', async () => {
   expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
   expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
-
 test('should respond 404 when file does not exist.', async () => {
   const client = createClient();
   await client.connect();
@@ -276,4 +275,32 @@ test('should close the connection when "Connection: close" is in the request hea
   expect(header.keyValues['Connection']).toBe('close');
   expect(client.isClosed).toBeTruthy();
   expect(client.isBufferEmpty()).toBeTruthy();
+});
+
+test('should respond 200 when there are no spaces between header key and value.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.send(['GET /testfile.txt HTTP/1.1', 'Host:localhost', '\r\n'].join('\r\n'));
+  await waitForResponse();
+
+  const response = client.nextHttpResponse();
+
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
+});
+
+test('should respond 200 when there are multiple spaces between header key and value.', async () => {
+  const client = createClient();
+  await client.connect();
+
+  client.send(['GET /testfile.txt HTTP/1.1', 'Host:     localhost', '\r\n'].join('\r\n'));
+  await waitForResponse();
+
+  const response = client.nextHttpResponse();
+
+  expect(response.header.code).toBe('200');
+  expect(response.header.keyValues['Content-Length']).toBe(DOC_MAP['testfile.txt'].length.toString());
+  expect(areBuffersEqual(response.body, DOC_MAP['testfile.txt'])).toBeTruthy();
 });
