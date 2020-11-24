@@ -101,23 +101,21 @@ describe('Bad Request', () => {
     expect(header.code).toBe('400');
     expect(header.description).toBe('Bad Request');
   });
-  test('should close connection when the second request is malformed ', async () => {
+  test('should respond 400 when Host is malformed ', async () => {
     const client = createClient();
     await client.connect();
   
-    client.sendHttpGet('/testfile.txt', { Host: 'localhost' });
-    client.sendHttpGet('/index.html', {});
+    client.send([
+      'GET /index.html HTTP/1.1',
+      'Hostlocalhost',
+      '\r\n'
+    ].join('\r\n'))
+
     await waitForResponse();
   
-    const response1 = client.nextHttpResponse();
-    const response2 = client.nextHttpResponse();
-  
-    expect(
-      is200ResponseWithExpectedContentTypeAndBody(response1, 'text/plain', DOC_MAP['testfile.txt'], false)
-    ).toBeTruthy();
-    expect(is400Response(response2)).toBeTruthy();
-    expect(client.isClosed).toBeTruthy();
-    expect(client.isBufferEmpty()).toBeTruthy();
+    const { header } = client.nextHttpResponse();
+    expect(header.code).toBe('400');
+    expect(header.description).toBe('Bad Request');
   });
   test('should respond 400 when sending empty format request', async () => {
     // send empty format
