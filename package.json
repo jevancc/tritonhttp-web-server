@@ -10,9 +10,9 @@
     "lint": "go fmt ./src/tritonhttp/ ./src/main && npx prettier testing/**/*.{js,text.js} --write && npx eslint testing/**/*.{js,text.js} --fix",
     "go:setup": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:$GOPATH/bin\" go get github.com/go-ini/ini",
     "start": "npm run go:setup && cross-env GOPATH=${PWD} PATH=\"$PATH:$GOPATH/bin\" go run src/main/main.go src/myconfig.ini",
-    "kill": "npx kill-port",
-    "kill:test": "npx kill-port 7001 7002 7003 7004 7005",
-    "kill:all": "npx kill-port 8080 && npm run kill:test"
+    "kill": "npx fkill-cli --force --silent",
+    "kill:test": "npx fkill-cli --force --silent :7001 :7002 :7003 :7004 :7005",
+    "kill:all": "npx fkill-cli --force --silent :8080 && npm run kill:test"
   },
   "testing": {
     "use-default-server": false
@@ -32,9 +32,10 @@
     "eslint": "^7.12.1",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.15.0",
+    "fkill": "^7.0.1",
+    "fkill-cli": "^6.0.1",
     "jest": "^26.6.1",
     "jest-html-reporters": "^2.1.0",
-    "kill-port": "^1.6.1",
     "prettier": "2.1.2",
     "shelljs": "^0.8.4",
     "tmp": "^0.2.1"

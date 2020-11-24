@@ -31,8 +31,8 @@ beforeAll(async () => {
   await waitForServerStart();
 });
 
-afterAll(() => {
-  server.cleanup();
+afterAll(async () => {
+  await server.cleanup();
 });
 
 test('should connect to server.', async () => {

@@ -30,8 +30,8 @@ beforeAll(async () => {
   await waitForServerStart();
 });
 
-afterAll(() => {
-  server.cleanup();
+afterAll(async () => {
+  await server.cleanup();
 });
 
 test('should respond correct content when client sends multiple requests and closes connection after timeout', async () => {

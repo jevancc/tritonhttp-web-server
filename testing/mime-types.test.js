@@ -25,8 +25,8 @@ beforeAll(async () => {
   await waitForServerStart();
 });
 
-afterAll(() => {
-  server.cleanup();
+afterAll(async () => {
+  await server.cleanup();
 });
 
 test('should respond with content-type (basic)', async () => {

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const tmp = require('tmp');
 const shell = require('shelljs');
-const kill = require('kill-port');
+const fkill = require('fkill');
 const { TritonHTTPTestClient } = require('./client');
 
 const { testing: defaultTestingConfig } = require('../../package.json');
@@ -37,14 +37,15 @@ function runServer(config = {}) {
     return client;
   };
 
-  const cleanup = () => {
-    serverProcess.kill('SIGKILL');
+  const cleanup = async () => {
+    await fkill(serverProcess.pid);
+    await fkill(`:${port}`);
+
     configFile.removeCallback();
     if (docDir) {
       shell.rm('-rf', path.join(docDir.name, '*'));
       docDir.removeCallback();
     }
-    kill(port, 'tcp');
     for (const client of clients) {
       client.close();
     }
