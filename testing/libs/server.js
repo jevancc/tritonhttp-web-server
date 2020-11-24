@@ -38,8 +38,8 @@ function runServer(config = {}) {
   };
 
   const cleanup = async () => {
-    await fkill(serverProcess.pid);
-    await fkill(`:${port}`);
+    await fkill(serverProcess.pid, { silent: true, force: true });
+    await fkill(`:${port}`, { silent: true, force: true });
 
     configFile.removeCallback();
     if (docDir) {
