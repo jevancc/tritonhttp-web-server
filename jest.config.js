@@ -101,11 +101,11 @@ module.exports = {
   // Use this configuration option to add custom reporters to Jest
   reporters: [
     'default',
-    ['jest-html-reporters', {
-      publicPath: "./testing",
-      filename: 'report.html',
-      expand: true,
-    }]
+    // ['jest-html-reporters', {
+    //   publicPath: "./testing",
+    //   filename: 'report.html',
+    //   expand: true,
+    // }]
   ],
 
   // Automatically reset mock state between every test

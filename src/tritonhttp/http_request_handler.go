@@ -30,7 +30,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 	// Start a loop for reading requests continuously
 	for {
 		// Set a timeout for read operation
-		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+		var _ = conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 
 		// Read from the connection socket into a buffer
 		if b, err := reader.ReadByte(); err != nil {

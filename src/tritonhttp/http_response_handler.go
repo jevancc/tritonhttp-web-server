@@ -115,9 +115,9 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, body []byt
 	}
 
 	// Send file if required
-	conn.Write([]byte(responseHeaderString))
-	conn.Write([]byte("\r\n"))
-	conn.Write(body)
+	var _, _ = conn.Write([]byte(responseHeaderString))
+	var _, _ = conn.Write([]byte("\r\n"))
+	var _, _ = conn.Write(body)
 }
 
 func makeResponseInitialLine(code string, description string) string {

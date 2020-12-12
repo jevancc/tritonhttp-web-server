@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-ini/ini"
 	"log"
 	"net/http"
 	"os"
 	"time"
 	"tritonhttp"
+
+	"github.com/go-ini/ini"
 )
 
 // Server startup configuration constants
 const ARG_COUNT int = 2
+
 const CONFIG_FILE_INDEX int = 1
 
 // Exit flags
@@ -38,7 +40,7 @@ func main() {
 	}
 
 	// Load the configuration file
-	configFilePath := os.Args[1]
+	configFilePath := os.Args[CONFIG_FILE_INDEX]
 	configContent, err := ini.Load(configFilePath)
 	if err != nil {
 		log.Println(err)
