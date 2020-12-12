@@ -24,6 +24,8 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ^1.15
+        
+    - run: npm install
     
     - name: Check Go formatting
       uses: Jerome1337/gofmt-action@v1.0.4
@@ -39,8 +41,6 @@ jobs:
         version: v1.33
         working-directory: ./src/tritonhttp
     
-    - run: npm install
-      
     - name: eslint
       run: npm run lint:js
     
