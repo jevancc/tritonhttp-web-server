@@ -1,4 +1,7 @@
 # TritonHTTP Web Server
+![Build & Test](
+    https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Build%20&%20Test/badge.svg)
+    
 ## Usage
 Step 0:
 You need to [install Go](https://golang.org/doc/install) to work with the assignment.
