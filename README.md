@@ -1,6 +1,8 @@
 # TritonHTTP Web Server
 ![Build & Test](
     https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Build%20&%20Test/badge.svg)
+![Format & Lint](
+    https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Format%20&%20Lint/badge.svg)
     
 ## Usage
 Step 0:
