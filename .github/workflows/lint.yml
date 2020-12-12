@@ -26,10 +26,10 @@ jobs:
         go-version: ^1.15
     
     - name: Check Go formatting
-        uses: Jerome1337/gofmt-action@v1.0.4
-        with:
-          gofmt-path: ./src
-          gofmt-flags: -l -d
+      uses: Jerome1337/gofmt-action@v1.0.4
+      with:
+        gofmt-path: ./src
+        gofmt-flags: -l -d
     
     - run: npm run install:go
       
