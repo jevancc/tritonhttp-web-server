@@ -47,5 +47,6 @@ testem.log
 Thumbs.db
 
 # Go
-src/github.com
+/src/github.com
 pkg
+/bin
