@@ -9,7 +9,7 @@ async function waitForResponse() {
 module.exports.waitForResponse = waitForResponse;
 
 async function waitForServerStart() {
-  await sleep(3000);
+  await sleep(2000);
 }
 module.exports.waitForServerStart = waitForServerStart;
 
@@ -49,6 +49,7 @@ function is200ResponseWithExpectedContentTypeAndBody(
   hasConnectionClose = false
 ) {
   const { header, body } = response;
+
   return (
     header.code === '200' &&
     header.version === 'HTTP/1.1' &&
@@ -103,7 +104,7 @@ function isValidLastModifiedString(s) {
     } else {
       const { dayName, date: dateString } = match.groups;
       const date = new Date(dateString);
-      if (isNaN(date.getTime()) || weekDayStrings[date.getDay()] !== dayName) {
+      if (isNaN(date.getTime()) || weekDayStrings[date.getUTCDay()] !== dayName) {
         return false;
       } else {
         return true;

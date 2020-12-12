@@ -59,8 +59,7 @@ function createTempServerConfigFile(config = {}) {
   const { useDefaultServer, port, docRoot, mimeTypes } = config;
 
   const configFile = tmp.fileSync({
-    discardDescriptor: true,
-    mode: 0o644,
+    mode: 0o775,
     prefix: 'triton-http-test-config',
     postfix: '.ini',
   });

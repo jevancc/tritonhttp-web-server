@@ -4,9 +4,8 @@
   "description": "TritonHTTP Web Server",
   "main": "index.js",
   "scripts": {
-    "test": "npm run install:go && npm run kill:test && npx jest testing --config=jest.config.js --runInBand",
-    "test:basic": "npm run install:go && npm run kill:test && npx jest testing/basic.test.js --config=jest.config.js --runInBand",
-    "start:test": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:${PWD}/bin\" go run src/main/main.go",
+    "test": "npm run build && npm run kill:test && npx jest testing --config=jest.config.js --runInBand --verbose",
+    "test:basic": "npm run build && npm run kill:test && npx jest testing/basic.test.js --config=jest.config.js --verbose",
     "format": "npm run format:go && npm run format:js",
     "format:js": "npx prettier testing/**/*.{js,text.js} --write && npx eslint testing/**/*.{js,test.js} --fix",
     "format:go": "go fmt ./src/tritonhttp/ ./src/main",
@@ -15,7 +14,9 @@
     "lint:go": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:${PWD}/bin\" golangci-lint run ./src/main/... ./src/tritonhttp/...",
     "install:go": "cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:${PWD}/bin\" go get github.com/go-ini/ini",
     "install:go-dev": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.33.0",
-    "start": "npm run install:go && cross-env GOPATH=${PWD} PATH=\"$PATH:${PWD}/bin\" go run src/main/main.go src/myconfig.ini",
+    "build": "npm run install:go && cross-env GOPATH=\"${PWD}\" PATH=\"$PATH:${PWD}/bin\" go install ./src/main/...",
+    "start": "npm run build && ./bin/main src/myconfig.ini",
+    "start:test": "./bin/main",
     "kill": "npx fkill-cli --force --silent",
     "kill:test": "npx fkill-cli --force --silent :7001 :7002 :7003 :7004 :7005",
     "kill:all": "npx fkill-cli --force --silent :8080 && npm run kill:test"
