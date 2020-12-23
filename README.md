@@ -4,7 +4,7 @@
 ![Format & Lint](
     https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Format%20&%20Lint/badge.svg)
 
-<div style="text-align:center"><img width="300" src="./ucsd-logo.png" /></div>
+<div align="center"><img width="300" src="./ucsd-logo.png" /></div>
 
 A simple web server implements TritonHTTP, a subset of the HTTP/1.1 protocol specification. Through the TritonHTTP web server, clients can connect to the server TCP socket using TritonHTTP protocol to retrieve files from the server. The TritonHTTP web server is able to map the URL in the request to the local file paths to serve the requested content. 
 
