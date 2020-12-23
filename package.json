@@ -1,6 +1,6 @@
 {
   "name": "module-2-project-cse224-chan-xia",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "TritonHTTP Web Server",
   "main": "index.js",
   "scripts": {
@@ -28,8 +28,11 @@
     "type": "git",
     "url": "git+https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia.git"
   },
-  "author": "",
-  "license": "ISC",
+  "contributors": [
+    "jevancc",
+    "summer110669"
+  ],
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia/issues"
   },
