@@ -1,8 +1,10 @@
 {
-  "name": "module-2-project-cse224-chan-xia",
+  "name": "tritonhttp-web-server",
   "version": "0.1.0",
   "description": "TritonHTTP Web Server",
-  "main": "index.js",
+  "engines": {
+    "node": ">=15.1.0"
+  },
   "scripts": {
     "test": "npm run build && npm run kill:test && npx jest testing --config=jest.config.js --runInBand --verbose",
     "test:basic": "npm run build && npm run kill:test && npx jest testing/basic.test.js --config=jest.config.js --verbose",
@@ -26,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia.git"
+    "url": "git+https://github.com/jevancc/tritonhttp-web-server"
   },
   "contributors": [
     "jevancc",
@@ -34,9 +36,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia/issues"
+    "url": "https://github.com/jevancc/tritonhttp-web-server/issues"
   },
-  "homepage": "https://github.com/ucsd-cse-x24-fa20/module-2-project-cse224-chan-xia#readme",
+  "homepage": "https://github.com/jevancc/tritonhttp-web-server#readme",
   "devDependencies": {
     "cross-env": "^7.0.2",
     "eslint": "^7.12.1",
