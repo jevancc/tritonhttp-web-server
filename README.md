@@ -1,8 +1,10 @@
 # TritonHTTP Web Server
+
 ![Build & Test](
     https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Build%20&%20Test/badge.svg)
 ![Format & Lint](
     https://github.com/jevancc/module-2-project-cse224-chan-xia/workflows/Format%20&%20Lint/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <div align="center"><img width="300" src="./ucsd-logo.png" /></div>
 
