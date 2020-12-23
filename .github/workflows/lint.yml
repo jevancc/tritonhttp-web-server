@@ -14,33 +14,33 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      
+
     - name: Use Node.js 15
       uses: actions/setup-node@v1
       with:
         node-version: 15.x
-  
+
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
         go-version: ^1.15
-        
-    - run: npm install
-    
+
+    - run: npm ci
+
     - name: Check Go formatting
       uses: Jerome1337/gofmt-action@v1.0.4
       with:
         gofmt-path: ./src
         gofmt-flags: -l -d
-    
+
     - run: npm run install:go
-      
+
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v2
       with:
         version: v1.33
         working-directory: ./src/tritonhttp
-    
+
     - name: eslint
       run: npm run lint:js
-    
+
